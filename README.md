@@ -1,216 +1,89 @@
-# Sistema RAT v2.0 - Guia de Setup e Uso
+# 🛠️ Sistema RAT v2.5 - Guia de Setup, Uso e Estrutura (Madetech)
 
-## 🚀 Setup Inicial
-
-### 1. Banco de Dados
-O banco SQLite é criado automaticamente na primeira execução.
-
-**Admin padrão (criado automaticamente):**
-- Email: `admin@madetech.com.br`
-- Senha: `admin123`
-- ⚠️ Mude a senha após primeira login!
-
-### 2. Configurar SMTP (Emails)
-Edite `api/config.php` e configure:
-
-```php
-define('SMTP_HOST', 'mail.madetech.com.br');
-define('SMTP_PORT', 587);
-define('SMTP_USER', 'seu-email@madetech.com.br');
-define('SMTP_PASS', 'sua-senha');
-define('EMAIL_SUPORTE_CENTRAL', 'suporte@madetech.com.br');
-define('EMAIL_MARKETING_CENTRAL', 'marketing@madetech.com.br');
-```
-
-### 3. Primeiro Acesso
-
-#### Admin
-1. Acesse: `https://sitenovo.madetech.com.br/rats-mdt2026/admin/login.php`
-2. Email: `admin@madetech.com.br` | Senha: `admin123`
-3. Vá para "Gerenciar Técnicos"
-4. Crie contas para seus técnicos
-
-#### Técnico
-1. Recebe email com login (fornecido pelo admin)
-2. Acessa: `https://sitenovo.madetech.com.br/rats-mdt2026/tecnico/login.php`
-3. Cria seus próprios RATs
+O **Sistema RAT (Relatório de Assistência Técnica)** é um sistema robusto em PHP e SQLite desenvolvido para substituir formulários legados (como JotForm), garantindo um controle refinado sobre os atendimentos realizados, geração automatizada de relatórios em PDF com assinaturas digitais em canvas, controle de despesas e múltiplos envios de e-mails para os setores envolvidos.
 
 ---
 
-## 📊 Fluxo Completo
+## 🚀 Setup Inicial & Configuração
 
-### Para o Administrador
+### 1. Banco de Dados (SQLite)
+O banco de dados SQLite (`data/rats.db`) é **auto-inicializável**. Na primeira execução do sistema, as tabelas de administradores, técnicos e relatórios são criadas de forma automática, bem como as migrações mais recentes de esquema.
 
-```
-ADMIN LOGIN
-↓
-PAINEL ADMIN (Dashboard)
-├── Ver todos RATs
-├── Filtrar por técnico, status, mês
-├── Clique "Gerenciar Técnicos"
-│   ├── Criar novo técnico
-│   ├── Editar técnico
-│   └── Deletar técnico
-└── Clique "Ver" em um RAT
-    └── Visualizar completo (read-only)
-```
+> [!NOTE]
+> A pasta `/data` possui proteção por `.htaccess` para impedir o acesso externo ao arquivo `.db`.
 
-### Para o Técnico
+### 2. Configurações de SMTP & Credenciais
+Todas as definições globais, credenciais de e-mail e constantes do banco residem em [api/config.php](file:///c:/Users/madet/Desktop/Marketing%20Madetech/Site%20Madetech%20Master/rats-mdt2026/api/config.php).
 
-```
-TÉCNICO LOGIN
-↓
-PAINEL TÉCNICO (Pessoal)
-├── Ver APENAS seus RATs
-├── Filtrar por status
-└── Clique "Criar Novo RAT"
-    │
-    └─→ Preencher Dados Iniciais
-        ├── Empresa
-        ├── Responsável
-        ├── Email cliente
-        ├── Endereço, Cidade, Estado
-        └── Sistema gera: RAT-{seu_id}-{seq}
-            
-            └─→ Editar RAT (Completo)
-                ├── Equipamento
-                ├── Defeito + Trabalho
-                ├── Turnos (5 dias)
-                ├── Horas viajadas
-                ├── KMs rodados
-                ├── Adicionais (pedágio, hospedagem, alimentação)
-                ├── Assinatura cliente + aceite
-                ├── Assinatura técnico + aceite
-                │
-                ├── [SALVAR] = Rascunho (pode editar depois)
-                │
-                └── [ENVIAR] = FINAL
-                    ├── Valida campos obrigatórios
-                    ├── Gera 4 PDFs automáticos
-                    │   ├── PDF COMPLETO → Técnico
-                    │   ├── PDF SUPORTE → suporte@madetech.com.br
-                    │   ├── PDF MARKETING → marketing@madetech.com.br
-                    │   └── PDF CLIENTE → email_cliente (SEM ADICIONAIS)
-                    └── Envia 4 emails automáticos
-```
+Atualmente está configurado para envio seguro via **Google Workspace (SMTP Gmail)**:
+*   **Host SMTP**: `smtp.gmail.com`
+*   **Porta**: `587` (TLS)
+*   **Remetente**: `marketing@madetech.com.br`
+*   **Destinatários Padrão**:
+    *   Suporte Central: `suporte@madeparts.com.br`
+    *   Marketing Central: `marketing@madetech.com.br`
 
 ---
 
-## 🔐 Números de RAT
+## 📂 Estrutura Operacional
 
-Cada técnico tem seu próprio sequencial:
+### Para o Administrador (/admin)
+*   **Dashboard Geral**: Acesso e visualização em tempo real de todos os RATs emitidos. Filtros dinâmicos por técnico, status e mês.
+*   **Gestão de Técnicos (CRUD)**: Criação, edição e exclusão de contas técnicas.
+*   **Controle de Feedbacks**: Possibilidade de adicionar feedback técnico e de suporte a cada relatório.
 
+### Para o Técnico (/tecnico)
+*   **Dashboard Individual**: Visualização exclusiva de seus próprios relatórios.
+*   **Criador de RATs**: Geração sequencial personalizada por técnico.
+    *   *Formato*: `RAT-{ID_TECNICO_2_DIGITOS}-{SEQUENCIAL_4_DIGITOS}`
+*   **Formulário Completo**:
+    *   Dados do cliente, equipamento, modelo e garantia.
+    *   Defeito constatado e detalhamento do trabalho executado.
+    *   Tipos de serviço selecionáveis.
+    *   Registro de **Turnos de Trabalho** e **Horas Viajadas** (com cálculos automatizados de horas).
+    *   Registro detalhado de **KMs rodados** e **Despesas Adicionais** (Pedágio com quantidade, Alimentação com quantidade, Hospedagem em dias, e Despesas diversas).
+    *   Upload de Notas Fiscais e comprovantes em JSON.
+    *   **Assinatura Digital (Canvas HTML5)** do cliente (com Nome, Cargo e CPF) e do técnico.
+
+---
+
+## 📊 Fluxo de Emissão do RAT
+
+```mermaid
+graph TD
+    A[Técnico inicia RAT] --> B[Salva como Rascunho]
+    B --> C[Edições e preenchimentos adicionais]
+    C --> D[Assinatura digital e Aceites]
+    D --> E{Clique em ENVIAR}
+    E --> F[Altera status para enviado]
+    E --> G[Gera PDFs inteligentes]
+    E --> H[Envia e-mails automáticos]
+    E --> I[Notificação WhatsApp]
 ```
-Alan (id=1):
-- RAT-01-0001 (primeiro)
-- RAT-01-0002 (segundo)
-- RAT-01-0003 (terceiro)
 
-Leonardo (id=2):
-- RAT-02-0001 (primeiro dele)
-- RAT-02-0002 (segundo dele)
-
-André (id=3):
-- RAT-03-0001
-```
-
-👉 **Formato:** `RAT-{ID_TECNICO_2_DIGITOS}-{SEQUENCIAL_4_DIGITOS}`
+### Versões dos PDFs e Destinatários
+Ao finalizar o envio de um RAT, o sistema gera dinamicamente até 4 PDFs e os distribui por e-mail:
+1.  **Completo**: Enviado para o e-mail do Técnico com todas as informações e despesas.
+2.  **Suporte Central (`suporte@madeparts.com.br`)**: Sem os dados confidenciais de viagem/despesas pessoais do técnico.
+3.  **Marketing (`marketing@madetech.com.br`)**: Cópia para arquivamento e validação de contatos.
+4.  **Cliente**: Enviado para o e-mail do cliente (contendo apenas o escopo técnico do atendimento, sem informações de despesas internas, pedágios, quilometragem ou hospedagem).
 
 ---
 
-## 📧 Nomes dos PDFs
+## 🛠️ Tecnologias Utilizadas
 
-Quando o técnico envia, o arquivo gerado é:
-
-```
-{PRIMEIRO_NOME}_{NUMERO_RAT}_{DATA}_{EMPRESA}.pdf
-```
-
-**Exemplo:**
-- Alan enviando: `Alan_RAT-01-0001_05-02-2026_EmpresaABC.pdf`
-
-**4 versões geradas:**
-1. `COMPLETO_Alan_RAT-01-0001_05-02-2026_EmpresaABC.pdf` → Técnico
-2. `SUPORTE_Alan_RAT-01-0001_05-02-2026_EmpresaABC.pdf` → Suporte
-3. `MARKETING_Alan_RAT-01-0001_05-02-2026_EmpresaABC.pdf` → Marketing
-4. `Alan_RAT-01-0001_05-02-2026_EmpresaABC.pdf` → Cliente
+*   **Backend**: PHP (estruturado, limpo e modularizado)
+*   **Banco de Dados**: SQLite3 (embarcado, veloz e de baixíssima manutenção)
+*   **Componente de E-mails**: PHPMailer (com suporte a SMTP TLS e anexos dinâmicos)
+*   **Assinatura Digital**: HTML5 Canvas API integrada ao formulário
+*   **PDF**: Suporte nativo à renderização inteligente do próprio navegador (Print-friendly) ou integração pronta para bibliotecas de renderização
 
 ---
 
-## 🔒 Segurança & Isolamento
+## 🎯 Checklist para Deploy e Manutenção
 
-- ✅ Admin vê TODOS RATs de todos técnicos
-- ✅ Técnico vê APENAS seus RATs
-- ✅ Técnico não pode editar RAT de outro
-- ✅ Tentativa de acesso direto retorna erro 403
-- ✅ Senhas com hash bcrypt (seguro)
-- ✅ Sessions PHP (auto-logout após 24h ou browser fecha)
-
----
-
-## 🛠️ Troubleshooting
-
-### Admin não consegue fazer login
-1. Verifique se `api/config.php` foi criado corretamente
-2. Verifique permissões da pasta `data/`
-3. Tente apagar `data/rats.db` (vai recriar)
-
-### Técnico não consegue fazer login
-1. Verificar se a conta foi criada pelo admin
-2. Verificar email/senha com o admin
-
-### Emails não sendo enviados
-1. Configurar SMTP em `api/config.php`
-2. Instalar PHPMailer: `composer require phpmailer/phpmailer`
-3. Log de erros em `enviar-email.php`
-
-### PDFs não gerando
-1. Atualmente gera como HTML (pode salvar como PDF)
-2. Para PDF real: instale DomPDF
-   ```
-   composer require dompdf/dompdf
-   ```
-
----
-
-## 📋 Campos Obrigatórios
-
-### Criar RAT
-- [x] Empresa
-- [x] Responsável
-- [x] Endereço
-- [x] Cidade
-- [x] Estado
-
-### Preencher RAT
-- [x] Equipamento
-- [x] Modelo
-- [x] Defeito constatado
-- [x] Trabalho executado
-- [x] Assinatura cliente + aceite
-- [x] Assinatura técnico + aceite
-
----
-
-## 🎯 Checklist de Deploy
-
-- [ ] Banco de dados criado
-- [ ] Admin padrão senha trocada
-- [ ] SMTP configurado
-- [ ] Técnicos criados
-- [ ] Tencnicos conseguem fazer login
-- [ ] Técnico consegue criar RAT
-- [ ] Técnico consegue enviar RAT
-- [ ] Emails sendo recebidos
-- [ ] PDFs sendo gerados
-- [ ] Admin consegue visualizar todos RATs
-
----
-
-## 📞 Suporte
-
-Para dúvidas ou bugs, contate o desenvolvedor com:
-1. Email que está tentando logar
-2. Mensagem de erro (se houver)
-3. Qual ação estava realizando
-
+- [x] Banco de dados auto-inicializado com migrations automáticas
+- [x] Arquivo `.gitignore` devidamente configurado para proteger o arquivo SQLite e a pasta `vendor/`
+- [x] SMTP configurado com credenciais seguras de App da Google Workspace
+- [ ] Troca periódica das credenciais administrativas
+- [ ] Backup periódico manual ou via API do arquivo `/data/rats.db`
