@@ -1,0 +1,23 @@
+# Ignore vendor directory (Composer dependencies)
+/vendor/
+
+# Ignore SQLite databases
+/data/*.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore VS Code settings
+/.vscode/
+
+# Ignore backups and temporary files
+/backups/*
+!/backups/.htaccess
+
+# Ignore uploads
+/uploads/**/*
+!/uploads/notas/
+
+# Ignore other environment/system files
+.DS_Store
+Thumbs.db
