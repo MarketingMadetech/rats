@@ -218,6 +218,7 @@ define('SMTP_PASS', 'ygxe jfci uosn epci');
 define('SMTP_SECURE', 'ssl');
 define('EMAIL_SUPORTE_CENTRAL', 'suporte@madeparts.com.br');
 define('EMAIL_MARKETING_CENTRAL', 'marketing@madetech.com.br');
+define('EMAIL_ADMINISTRATIVO', 'administrativo@madeparts.com.br');
 define('EMAIL_FROM_NAME', 'Sistema RAT - Madetech');
 
 // Inicializar banco na primeira execução

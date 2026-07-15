@@ -71,6 +71,14 @@ function enviarPDFsPorEmail($rat_id, $db) {
                 'pdf' => $pdf_cliente,
                 'pdf_nome' => $nome_arquivo,
                 'extras' => [] // cliente não recebe notas fiscais internas
+            ],
+            [
+                'para' => EMAIL_ADMINISTRATIVO,
+                'assunto' => "{$data_rat} - {$rat['numero']} - {$rat['cliente_empresa']} - {$rat['tecnico_nome']}",
+                'corpo' => prepararCorpoEmail($rat, 'administrativo'),
+                'pdf' => $pdf_completo,
+                'pdf_nome' => $nome_arquivo,
+                'extras' => $notas_fiscais_caminhos
             ]
         ];
         
@@ -158,6 +166,17 @@ function prepararCorpoEmail($rat, $tipo) {
         $html .= "
             <p>Olá <strong>" . htmlspecialchars($rat['tecnico_nome']) . "</strong>,</p>
             <p>Seu RAT foi criado com sucesso! O PDF completo está anexado para sua documentação.</p>
+            ";
+    } elseif ($tipo === 'administrativo') {
+        $html .= "
+            <p>Novo RAT recebido (Cópia Completa com despesas e reembolsos).</p>
+            <div class='info-box'>
+                <strong>Técnico:</strong> " . htmlspecialchars($rat['tecnico_nome']) . "<br>
+                <strong>Cliente:</strong> " . htmlspecialchars($rat['cliente_empresa']) . "<br>
+                <strong>Equipamento:</strong> " . htmlspecialchars($rat['modelo_maquina']) . "<br>
+                <strong>Data de Criação:</strong> " . date('d/m/Y H:i', strtotime($rat['data_criacao'])) . "<br>
+            </div>
+            <p>O PDF completo e os comprovantes de despesas (se houver) estão anexados.</p>
             ";
     } elseif ($tipo === 'suporte') {
         $link_rat = SITE_URL . BASE_URL . "admin/rat-view.php?id=" . $rat['id'];
