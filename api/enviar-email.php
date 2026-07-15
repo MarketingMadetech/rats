@@ -770,6 +770,15 @@ function enviarEmailComPDF($para, $assunto, $corpo_html, $pdf_html, $nome_arquiv
         $mail->CharSet    = 'UTF-8';
         $mail->Encoding   = 'base64';
         
+        // Desativar verificação estrita de SSL/TLS (evita erro de CN mismatch por redirecionamento do host)
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
+        
         // Remetente
         $mail->setFrom(SMTP_USER, EMAIL_FROM_NAME);
         $mail->addReplyTo(SMTP_USER, EMAIL_FROM_NAME);

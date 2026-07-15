@@ -342,11 +342,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="logo-section">
             <div class="logo-container">
                 <div class="logo-item">
-                    <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech">
                 </div>
                 <div style="color: rgba(255, 255, 255, 0.3); font-size: 24px;">|</div>
                 <div class="logo-item">
-                    <img src="https://sitenovo.madetech.com.br/assets/logomadeparts.avif" alt="Madeparts">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/07/Logo-Madeparts-Final.png" alt="Madeparts">
                 </div>
             </div>
             <h1>Sistema RAT</h1>

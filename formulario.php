@@ -176,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $sucesso ? 'RAT Enviado!' : 'Relatório de Assistência Técnica - ' . ($rat['numero'] ?? '') ?></title>
+    <title><?= $sucesso ? 'RAT Enviado!' : 'Relatório de Assistência Técnica - ' . (exibirNumeroRAT($rat['numero'] ?? '', $rat['numero_sequencial'] ?? null)) ?></title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -589,12 +589,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
         <?php else: ?>
             <div class="header">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 10px;">
-                    <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech" style="height: 60px;">
-                    <img src="https://sitenovo.madetech.com.br/assets/logomadeparts.avif" alt="Madeparts" style="height: 60px;">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech" style="height: 60px;">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/07/Logo-Madeparts-Final.png" alt="Madeparts" style="height: 60px;">
                 </div>
                 <div class="subtitle">MADETECH E MADEPARTS</div>
                 <h1>Relatório de Assistência Técnica</h1>
-                <span class="rat-number"><?= htmlspecialchars($rat['numero']) ?></span>
+                <span class="rat-number"><?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?></span>
             </div>
             
             <?php if (isset($erro)): ?>

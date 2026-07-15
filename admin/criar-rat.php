@@ -224,7 +224,7 @@ $total_tecnicos = count($tecnicos);
     <aside class="sidebar">
         <div class="sidebar-brand">
             <div class="logo-row">
-                <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech">
+                <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech">
                 <h2>Sistema RAT</h2>
             </div>
             <span class="version-badge">Admin v1.0</span>
@@ -235,6 +235,17 @@ $total_tecnicos = count($tecnicos);
                 <a href="index.php" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
                 <a href="tecnicos.php" class="nav-item"><i class="fas fa-users"></i> Técnicos</a>
                 <a href="criar-rat.php" class="nav-item active"><i class="fas fa-plus-circle"></i> Criar RAT</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Acesso</div>
+                <a href="../tecnico/login.php" class="nav-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    Painel Técnico
+                </a>
+                <a href="https://madetech.com.br/checklist/" target="_blank" class="nav-item">
+                    <i class="fas fa-clipboard-check"></i>
+                    Checklist
+                </a>
             </div>
         </nav>
         <div class="sidebar-footer">

@@ -255,7 +255,7 @@ $kms_rodados_lista = json_decode($rat['kms_rodados_json'] ?? '[]', true);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preencher RAT - <?php echo htmlspecialchars($rat['numero']); ?> | Sistema RAT</title>
+    <title>Preencher RAT - <?php echo htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)); ?> | Sistema RAT</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -738,7 +738,7 @@ $kms_rodados_lista = json_decode($rat['kms_rodados_json'] ?? '[]', true);
                 <span>/</span>
                 <span>Preencher RAT</span>
             </div>
-            <div class="rat-badge">📋 <?php echo htmlspecialchars($rat['numero']); ?></div>
+            <div class="rat-badge">📋 <?php echo htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)); ?></div>
             <h1 class="page-title">Preencher Relatório Técnico</h1>
             <p class="page-subtitle">Complete todos os campos para finalizar o RAT</p>
         </div>

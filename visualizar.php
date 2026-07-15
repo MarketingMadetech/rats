@@ -32,7 +32,7 @@ $whatsapp_link = formatWhatsAppLink(WHATSAPP_NOTIFY, $whatsapp_msg);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $rat['numero'] ?> - Sistema RAT Madetech</title>
+    <title><?= exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null) ?> - Sistema RAT Madetech</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="assets/admin.css" rel="stylesheet">
@@ -43,8 +43,8 @@ $whatsapp_link = formatWhatsAppLink(WHATSAPP_NOTIFY, $whatsapp_msg);
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="logos-container">
-                    <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech" class="logo">
-                    <img src="https://sitenovo.madetech.com.br/assets/logomadeparts.avif" alt="Madeparts" class="logo">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech" class="logo">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/07/Logo-Madeparts-Final.png" alt="Madeparts" class="logo">
                 </div>
                 <h2>Sistema RAT</h2>
             </div>
@@ -69,7 +69,7 @@ $whatsapp_link = formatWhatsAppLink(WHATSAPP_NOTIFY, $whatsapp_msg);
             <header class="main-header">
                 <h1>
                     <i class="fas fa-file-alt"></i> 
-                    <?= htmlspecialchars($rat['numero']) ?>
+                    <?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?>
                     <span class="status-badge <?= $rat['status'] ?>"><?= ucfirst($rat['status']) ?></span>
                 </h1>
                 <a href="index.php" class="btn btn-secondary">
@@ -110,7 +110,7 @@ $whatsapp_link = formatWhatsAppLink(WHATSAPP_NOTIFY, $whatsapp_msg);
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Número</span>
-                            <span class="info-value"><?= htmlspecialchars($rat['numero']) ?></span>
+                            <span class="info-value"><?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Status</span>

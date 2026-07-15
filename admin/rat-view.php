@@ -500,7 +500,7 @@ foreach ($kms_rodados_lista as $km) {
 </head>
 <body>
     <header>
-        <h1>📋 RAT: <?php echo htmlspecialchars($rat['numero']); ?></h1>
+        <h1>📋 RAT: <?php echo htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)); ?></h1>
         <a href="index.php"><i class="fas fa-arrow-left"></i> Voltar</a>
     </header>
     
@@ -511,11 +511,25 @@ foreach ($kms_rodados_lista as $km) {
             <div class="info-grid">
                 <div class="info-field">
                     <div class="info-label">Número RAT</div>
-                    <div class="info-value"><strong><?php echo htmlspecialchars($rat['numero']); ?></strong></div>
+                    <div class="info-value"><strong><?php echo htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)); ?></strong></div>
                 </div>
                 <div class="info-field">
                     <div class="info-label">Status</div>
-                    <div class="info-value"><?php echo ucfirst($rat['status']); ?></div>
+                    <div class="info-value" style="display: flex; flex-direction: column; gap: 4px;">
+                        <span><?php echo ucfirst($rat['status']); ?></span>
+                        <?php if ($rat['status'] === 'enviado'): ?>
+                        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 2px;">
+                            <label class="reembolso-label" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: <?= $rat['pago_reembolso'] ? '#10b981' : '#64748b' ?>; cursor: pointer; transition: color 0.2s;">
+                                <input type="checkbox" class="toggle-reembolso" data-id="<?= $rat['id'] ?>" <?= $rat['pago_reembolso'] ? 'checked' : '' ?> style="accent-color: #10b981; cursor: pointer; width: 14px; height: 14px; margin: 0;">
+                                <span><?= $rat['pago_reembolso'] ? 'Reembolso Pago' : 'Pagar Reembolso' ?></span>
+                            </label>
+                            <label class="lancado-label" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: <?= !empty($rat['lancado_reembolso']) ? '#0284c7' : '#64748b' ?>; cursor: pointer; transition: color 0.2s;">
+                                <input type="checkbox" class="toggle-lancado" data-id="<?= $rat['id'] ?>" <?= !empty($rat['lancado_reembolso']) ? 'checked' : '' ?> style="accent-color: #0284c7; cursor: pointer; width: 14px; height: 14px; margin: 0;">
+                                <span><?= !empty($rat['lancado_reembolso']) ? 'Lançado Financeiro' : 'Lançar Financeiro' ?></span>
+                            </label>
+                        </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <div class="info-field">
                     <div class="info-label">Técnico</div>
@@ -1028,6 +1042,116 @@ foreach ($kms_rodados_lista as $km) {
     <script>
     document.getElementById('modalReenvio').addEventListener('click', function(e) {
         if (e.target === this) this.classList.remove('open');
+    });
+
+    // Toggle Reembolso Pago
+    document.querySelectorAll('.toggle-reembolso').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const ratId = this.dataset.id;
+            const isChecked = this.checked ? 1 : 0;
+            const labelText = this.nextElementSibling;
+            const labelContainer = this.closest('.reembolso-label');
+            
+            if (labelContainer) {
+                labelContainer.style.opacity = '0.5';
+            }
+            
+            fetch('../api/atualizar-pagamento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: ratId,
+                    pago: isChecked
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                if (data.success) {
+                    if (isChecked === 1) {
+                        labelContainer.style.color = '#10b981';
+                        if (labelText) labelText.textContent = 'Reembolso Pago';
+                    } else {
+                        labelContainer.style.color = '#64748b';
+                        if (labelText) labelText.textContent = 'Pagar Reembolso';
+                    }
+                } else {
+                    alert('Erro ao atualizar status do reembolso: ' + (data.error || 'Erro desconhecido'));
+                    this.checked = !this.checked;
+                }
+            })
+            .catch(err => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                alert('Erro de conexão ou permissão insuficiente.');
+                this.checked = !this.checked;
+            });
+        });
+    });
+
+    // Toggle Reembolso Lançado
+    document.querySelectorAll('.toggle-lancado').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const ratId = this.dataset.id;
+            const isChecked = this.checked ? 1 : 0;
+            const labelText = this.nextElementSibling;
+            const labelContainer = this.closest('.lancado-label');
+            
+            if (labelContainer) {
+                labelContainer.style.opacity = '0.5';
+            }
+            
+            fetch('../api/atualizar-lancamento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: ratId,
+                    lancado: isChecked
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                if (data.success) {
+                    if (isChecked === 1) {
+                        labelContainer.style.color = '#0284c7';
+                        if (labelText) labelText.textContent = 'Lançado Financeiro';
+                    } else {
+                        labelContainer.style.color = '#64748b';
+                        if (labelText) labelText.textContent = 'Lançar Financeiro';
+                    }
+                } else {
+                    alert('Erro ao atualizar status do lançamento: ' + (data.error || 'Erro desconhecido'));
+                    this.checked = !this.checked;
+                }
+            })
+            .catch(err => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                alert('Erro de conexão ou permissão insuficiente.');
+                this.checked = !this.checked;
+            });
+        });
     });
     </script>
 

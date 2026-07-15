@@ -61,7 +61,7 @@ function initDB() {
     $db->exec("
         CREATE TABLE IF NOT EXISTS rats (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            numero VARCHAR(20) UNIQUE NOT NULL,
+            numero VARCHAR(20) NOT NULL,
             numero_sequencial INTEGER,
             id_tecnico INTEGER NOT NULL,
             token VARCHAR(64) UNIQUE,
@@ -122,6 +122,8 @@ function initDB() {
             
             -- Notas adicionais
             observacoes TEXT,
+            pago_reembolso INTEGER DEFAULT 0,
+            lancado_reembolso INTEGER DEFAULT 0,
             
             -- Foreign key
             FOREIGN KEY (id_tecnico) REFERENCES tecnicos(id)
@@ -149,6 +151,8 @@ function initDB() {
         "ALTER TABLE rats ADD COLUMN data_feedback DATETIME",
         "ALTER TABLE rats ADD COLUMN orcamento_json TEXT DEFAULT '[]'",
         "ALTER TABLE rats ADD COLUMN tecnicos_adicionais_json TEXT DEFAULT '[]'",
+        "ALTER TABLE rats ADD COLUMN pago_reembolso INTEGER DEFAULT 0",
+        "ALTER TABLE rats ADD COLUMN lancado_reembolso INTEGER DEFAULT 0",
     ];
     foreach ($migrations as $sql) {
         try { $db->exec($sql); } catch(Exception $e) { /* coluna já existe */ }
@@ -157,29 +161,42 @@ function initDB() {
     return $db;
 }
 
-// Gerar número do RAT sequencial POR TÉCNICO
-function gerarNumeroRATporTecnico($id_tecnico) {
+// Obter próximo número sequencial de RAT para o técnico (inteiro)
+function obterProximoSequencialRAT($id_tecnico) {
     $db = getDB();
     $stmt = $db->prepare("SELECT MAX(numero_sequencial) as max_seq FROM rats WHERE id_tecnico = ?");
     $stmt->execute([$id_tecnico]);
     $result = $stmt->fetch();
-    $proximo = ($result['max_seq'] ?? 0) + 1;
-    $id_tecnico_pad = str_pad($id_tecnico, 2, '0', STR_PAD_LEFT);
-    return RAT_PREFIX . '-' . $id_tecnico_pad . '-' . str_pad($proximo, 4, '0', STR_PAD_LEFT);
+    return ($result['max_seq'] ?? 0) + 1;
+}
+
+// Gerar número do RAT sequencial formatado POR TÉCNICO (RAT-XX-YYYY)
+function gerarNumeroRATporTecnico($id_tecnico, $seq = null) {
+    if ($seq === null) {
+        $seq = obterProximoSequencialRAT($id_tecnico);
+    }
+    return "RAT-" . str_pad($id_tecnico, 2, '0', STR_PAD_LEFT) . "-" . str_pad($seq, 4, '0', STR_PAD_LEFT);
 }
 
 // Gerar número do RAT baseado no id real (chamado após o INSERT)
 function gerarNumeroRAT($id) {
-    return RAT_PREFIX . '-' . str_pad($id, 4, '0', STR_PAD_LEFT);
+    return (string)$id;
 }
 
 // Gerar número do RAT sequencial POR TÉCNICO (chamado ao enviar rascunho)
 function gerarNumeroRATGlobal($id_tecnico) {
-    $db = getDB();
-    $stmt = $db->prepare("SELECT COUNT(*) as total FROM rats WHERE id_tecnico = ? AND numero NOT LIKE 'RASCUNHO%'");
-    $stmt->execute([$id_tecnico]);
-    $result = $stmt->fetch();
-    return ($result['total'] ?? 0) + 1;
+    return obterProximoSequencialRAT($id_tecnico);
+}
+
+// Exibir apenas o número limpo do RAT (sem prefixo RAT-XX-YYYY se for formatado)
+function exibirNumeroRAT($numero, $numero_sequencial = null) {
+    if (!empty($numero_sequencial)) {
+        return (string)$numero_sequencial;
+    }
+    if (preg_match('/^RAT-\d{2}-(\d{4})$/', $numero, $matches)) {
+        return (string)intval($matches[1]);
+    }
+    return $numero;
 }
 
 // Gerar token único para o formulário
@@ -193,12 +210,12 @@ function formatWhatsAppLink($numero, $mensagem) {
     return "https://wa.me/{$numero}?text={$mensagem}";
 }
 
-// Configurações de Email (Google Workspace)
+// Configurações de Email (Google Workspace via SSL/465)
 define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_PORT', 587); // Porta recomendada pelo Google
+define('SMTP_PORT', 465);
 define('SMTP_USER', 'marketing@madetech.com.br');
-define('SMTP_PASS', 'ftvq ojye zwcp fitu');
-define('SMTP_SECURE', 'tls'); // TLS é o padrão e mais compatível
+define('SMTP_PASS', 'ygxe jfci uosn epci');
+define('SMTP_SECURE', 'ssl');
 define('EMAIL_SUPORTE_CENTRAL', 'suporte@madeparts.com.br');
 define('EMAIL_MARKETING_CENTRAL', 'marketing@madetech.com.br');
 define('EMAIL_FROM_NAME', 'Sistema RAT - Madetech');
@@ -233,6 +250,8 @@ if (!file_exists(DB_PATH)) {
             "ALTER TABLE rats ADD COLUMN data_feedback DATETIME",
             "ALTER TABLE rats ADD COLUMN orcamento_json TEXT DEFAULT '[]'",
             "ALTER TABLE rats ADD COLUMN tecnicos_adicionais_json TEXT DEFAULT '[]'",
+            "ALTER TABLE rats ADD COLUMN pago_reembolso INTEGER DEFAULT 0",
+            "ALTER TABLE rats ADD COLUMN lancado_reembolso INTEGER DEFAULT 0",
         ];
         foreach ($migrations as $sql) {
             try { $db_migrate->exec($sql); } catch(Exception $e) { /* coluna já existe */ }

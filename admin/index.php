@@ -997,7 +997,7 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
     <aside class="sidebar">
         <div class="sidebar-brand">
             <div class="logo-row">
-                <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech">
+                <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech">
                 <h2>Sistema RAT</h2>
             </div>
             <span class="version-badge">Admin v1.0</span>
@@ -1045,6 +1045,10 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
                 <a href="../tecnico/login.php" class="nav-item">
                     <i class="fas fa-exchange-alt"></i>
                     Painel Técnico
+                </a>
+                <a href="https://madetech.com.br/checklist/" target="_blank" class="nav-item">
+                    <i class="fas fa-clipboard-check"></i>
+                    Checklist
                 </a>
             </div>
         </nav>
@@ -1202,7 +1206,7 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
                         <tbody>
                             <?php foreach ($rats_recentes as $rat): ?>
                             <tr>
-                                <td><span class="rat-number"><?= htmlspecialchars($rat['numero']) ?></span></td>
+                                <td><span class="rat-number"><?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?></span></td>
                                 <td><strong><?= htmlspecialchars($rat['cliente_empresa'] ?? '-') ?></strong></td>
                                 <td>
                                     <div class="tecnico-name">
@@ -1214,6 +1218,18 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
                                     <span class="badge badge-<?= $rat['status'] ?>">
                                         <?= ucfirst($rat['status']) ?>
                                     </span>
+                                    <?php if ($rat['status'] === 'enviado'): ?>
+                                    <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+                                        <label class="reembolso-label" style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: <?= $rat['pago_reembolso'] ? 'var(--success)' : 'var(--gray-600)' ?>; cursor: pointer; transition: color 0.2s;">
+                                            <input type="checkbox" class="toggle-reembolso" data-id="<?= $rat['id'] ?>" <?= $rat['pago_reembolso'] ? 'checked' : '' ?> style="accent-color: var(--success); cursor: pointer; width: 13px; height: 13px; margin: 0;">
+                                            <span><?= $rat['pago_reembolso'] ? 'Reembolso Pago' : 'Pagar Reembolso' ?></span>
+                                        </label>
+                                        <label class="lancado-label" style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: <?= !empty($rat['lancado_reembolso']) ? 'var(--primary-light)' : 'var(--gray-600)' ?>; cursor: pointer; transition: color 0.2s;">
+                                            <input type="checkbox" class="toggle-lancado" data-id="<?= $rat['id'] ?>" <?= !empty($rat['lancado_reembolso']) ? 'checked' : '' ?> style="accent-color: var(--primary-light); cursor: pointer; width: 13px; height: 13px; margin: 0;">
+                                            <span><?= !empty($rat['lancado_reembolso']) ? 'Lançado Financeiro' : 'Lançar Financeiro' ?></span>
+                                        </label>
+                                    </div>
+                                    <?php endif; ?>
                                 </td>
                                 <td style="color: var(--gray-500); font-size: 13px;">
                                     <?= date('d/m/Y H:i', strtotime($rat['data_criacao'])) ?>
@@ -1267,6 +1283,116 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
     }
     document.querySelectorAll('.sidebar .nav-item').forEach(item => {
         item.addEventListener('click', () => { if (window.innerWidth <= 1024) toggleSidebar(); });
+    });
+
+    // Toggle Reembolso Pago
+    document.querySelectorAll('.toggle-reembolso').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const ratId = this.dataset.id;
+            const isChecked = this.checked ? 1 : 0;
+            const labelText = this.nextElementSibling;
+            const labelContainer = this.closest('.reembolso-label');
+            
+            if (labelContainer) {
+                labelContainer.style.opacity = '0.5';
+            }
+            
+            fetch('../api/atualizar-pagamento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: ratId,
+                    pago: isChecked
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                if (data.success) {
+                    if (isChecked === 1) {
+                        labelContainer.style.color = 'var(--success)';
+                        if (labelText) labelText.textContent = 'Reembolso Pago';
+                    } else {
+                        labelContainer.style.color = 'var(--gray-600)';
+                        if (labelText) labelText.textContent = 'Pagar Reembolso';
+                    }
+                } else {
+                    alert('Erro ao atualizar status do reembolso: ' + (data.error || 'Erro desconhecido'));
+                    this.checked = !this.checked;
+                }
+            })
+            .catch(err => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                alert('Erro de conexão ou permissão insuficiente.');
+                this.checked = !this.checked;
+            });
+        });
+    });
+
+    // Toggle Reembolso Lançado
+    document.querySelectorAll('.toggle-lancado').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const ratId = this.dataset.id;
+            const isChecked = this.checked ? 1 : 0;
+            const labelText = this.nextElementSibling;
+            const labelContainer = this.closest('.lancado-label');
+            
+            if (labelContainer) {
+                labelContainer.style.opacity = '0.5';
+            }
+            
+            fetch('../api/atualizar-lancamento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: ratId,
+                    lancado: isChecked
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                if (data.success) {
+                    if (isChecked === 1) {
+                        labelContainer.style.color = 'var(--primary-light)';
+                        if (labelText) labelText.textContent = 'Lançado Financeiro';
+                    } else {
+                        labelContainer.style.color = 'var(--gray-600)';
+                        if (labelText) labelText.textContent = 'Lançar Financeiro';
+                    }
+                } else {
+                    alert('Erro ao atualizar status do lançamento: ' + (data.error || 'Erro desconhecido'));
+                    this.checked = !this.checked;
+                }
+            })
+            .catch(err => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                alert('Erro de conexão ou permissão insuficiente.');
+                this.checked = !this.checked;
+            });
+        });
     });
     </script>
 </body>

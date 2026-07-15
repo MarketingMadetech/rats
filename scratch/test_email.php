@@ -23,6 +23,15 @@ try {
     $mail->Password   = SMTP_PASS;
     $mail->SMTPSecure = SMTP_SECURE === 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
     $mail->Port       = SMTP_PORT;
+    
+    // Desativar verificação estrita de SSL/TLS (evita erro de CN mismatch por redirecionamento do host)
+    $mail->SMTPOptions = array(
+        'ssl' => array(
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        )
+    );
 
     $mail->setFrom(SMTP_USER, 'Teste de Sistema');
     $mail->addAddress(SMTP_USER);

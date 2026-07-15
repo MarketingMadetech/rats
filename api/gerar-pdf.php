@@ -28,7 +28,7 @@ $tecnicos_adicionais = json_decode($rat['tecnicos_adicionais_json'] ?? '[]', tru
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($rat['numero']) ?> - Madetech RAT</title>
+    <title><?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?> - Madetech RAT</title>
     <style>
         @page {
             size: A4;
@@ -216,10 +216,10 @@ $tecnicos_adicionais = json_decode($rat['tecnicos_adicionais_json'] ?? '[]', tru
     
     <!-- Header -->
     <div class="header">
-        <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech">
+        <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech">
         <div class="header-info">
             <h1>Relatório de Assistência Técnica</h1>
-            <div class="rat-number"><?= htmlspecialchars($rat['numero']) ?></div>
+            <div class="rat-number"><?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?></div>
             <div><?= date('d/m/Y H:i', strtotime($rat['data_preenchimento'] ?: $rat['data_criacao'])) ?></div>
         </div>
     </div>

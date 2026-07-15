@@ -274,8 +274,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($acao === 'enviar') {
                 // Se ainda for rascunho temporário, gera o número sequencial final
                 if (strpos($rat['numero'], 'RASCUNHO') !== false) {
-                    $proximo_seq = gerarNumeroRATGlobal($tecnico_id);
-                    $numero_display = (string)$proximo_seq;
+                    $proximo_seq = obterProximoSequencialRAT($tecnico_id);
+                    $numero_display = gerarNumeroRATporTecnico($tecnico_id, $proximo_seq);
                     $stmt_seq = $db->prepare("UPDATE rats SET numero = ?, numero_sequencial = ? WHERE id = ?");
                     $stmt_seq->execute([$numero_display, $proximo_seq, $rat_id]);
                     $rat['numero'] = $numero_display;
@@ -426,7 +426,7 @@ $iniciais = strtoupper(substr($tecnico_nome, 0, 1));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Editar RAT <?= htmlspecialchars($rat['numero']) ?> | Sistema RAT</title>
+    <title>Editar RAT <?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?> | Sistema RAT</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1272,7 +1272,7 @@ $iniciais = strtoupper(substr($tecnico_nome, 0, 1));
     <aside class="sidebar">
         <div class="sidebar-brand">
             <div class="logo-row">
-                <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech">
+                <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech">
                 <h2>Sistema RAT</h2>
             </div>
             <span class="version-badge"><?= $_is_admin_mode ? 'Admin v1.0' : 'Técnico v1.0' ?></span>
@@ -1289,7 +1289,7 @@ $iniciais = strtoupper(substr($tecnico_nome, 0, 1));
             <div class="nav-section">
                 <div class="nav-section-title">RAT Atual</div>
                 <a href="<?= BASE_URL ?>admin/editar-rat.php?id=<?= $rat_id ?>" class="nav-item active">
-                    <i class="fas fa-file-edit"></i> <?= htmlspecialchars($rat['numero']) ?>
+                    <i class="fas fa-file-edit"></i> <?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?>
                 </a>
             </div>
             <?php else: ?>
@@ -1302,7 +1302,7 @@ $iniciais = strtoupper(substr($tecnico_nome, 0, 1));
             <div class="nav-section">
                 <div class="nav-section-title">RAT Atual</div>
                 <a href="editar-rat.php?id=<?= $rat_id ?>" class="nav-item active">
-                    <i class="fas fa-file-edit"></i> <?= htmlspecialchars($rat['numero']) ?>
+                    <i class="fas fa-file-edit"></i> <?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?>
                 </a>
                 <a href="criar-rat.php" class="nav-item">
                     <i class="fas fa-plus-circle"></i> Criar Novo
@@ -1345,7 +1345,7 @@ $iniciais = strtoupper(substr($tecnico_nome, 0, 1));
                 </div>
             </div>
             <div class="topbar-right">
-                <span class="rat-badge-top"><i class="fas fa-file-alt"></i> <?= htmlspecialchars($rat['numero']) ?></span>
+                <span class="rat-badge-top"><i class="fas fa-file-alt"></i> <?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?></span>
                 <?php if ($_is_admin_mode): ?>
                     <a href="<?= BASE_URL ?>admin/index.php" class="topbar-btn"><i class="fas fa-arrow-left"></i> Voltar</a>
                 <?php else: ?>

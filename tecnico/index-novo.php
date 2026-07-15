@@ -466,7 +466,7 @@ $rats = $stmt->fetchAll();
                     <tbody>
                         <?php foreach ($rats as $rat): ?>
                             <tr>
-                                <td><span class="rat-number"><?php echo htmlspecialchars($rat['numero']); ?></span></td>
+                                <td><span class="rat-number"><?php echo htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)); ?></span></td>
                                 <td><?php echo htmlspecialchars($rat['cliente_empresa'] ?? '-'); ?></td>
                                 <td>
                                     <span class="badge badge-<?php echo $rat['status']; ?>">

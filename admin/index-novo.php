@@ -23,7 +23,7 @@ $stats['total_tecnicos'] = $stmt->fetch()['total'] ?? 0;
 
 // RATs recentes
 $stmt = $db->query("
-    SELECT r.id, r.numero, t.nome as tecnico, r.status, r.data_criacao, r.cliente_empresa
+    SELECT r.id, r.numero, r.numero_sequencial, t.nome as tecnico, r.status, r.data_criacao, r.cliente_empresa
     FROM rats r
     LEFT JOIN tecnicos t ON r.id_tecnico = t.id
     ORDER BY r.data_criacao DESC
@@ -463,7 +463,7 @@ $rats_recentes = $stmt->fetchAll();
                 <tbody>
                     <?php foreach ($rats_recentes as $rat): ?>
                         <tr>
-                            <td><span class="rat-number"><?php echo htmlspecialchars($rat['numero']); ?></span></td>
+                            <td><span class="rat-number"><?php echo htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)); ?></span></td>
                             <td><?php echo htmlspecialchars($rat['tecnico'] ?? 'N/A'); ?></td>
                             <td><?php echo htmlspecialchars($rat['cliente_empresa'] ?? '-'); ?></td>
                             <td>

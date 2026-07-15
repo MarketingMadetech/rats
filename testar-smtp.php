@@ -6,11 +6,13 @@
 echo "<h2>Testando Conexão SMTP</h2>";
 echo "<hr>";
 
+require_once __DIR__ . '/api/config.php';
+
 // Configurações de teste
-$smtpHost = 'mail.madetech.com.br';
-$smtpPort = 587;
-$smtpUser = 'marketing@madetech.com.br';
-$smtpPass = 'ricardomadetech25';
+$smtpHost = defined('SMTP_HOST') ? SMTP_HOST : 'mail.madetech.com.br';
+$smtpPort = defined('SMTP_PORT') ? SMTP_PORT : 587;
+$smtpUser = defined('SMTP_USER') ? SMTP_USER : 'marketing@madetech.com.br';
+$smtpPass = defined('SMTP_PASS') ? SMTP_PASS : 'MarketingGuerra2026@';
 
 echo "<p><strong>Configurações:</strong></p>";
 echo "<ul>";
@@ -71,7 +73,16 @@ if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
         $mail->SMTPAuth = true;
         $mail->Username = $smtpUser;
         $mail->Password = $smtpPass;
-        $mail->SMTPSecure = 'tls';
+        $mail->SMTPSecure = defined('SMTP_SECURE') ? (SMTP_SECURE === 'tls' ? \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS : \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS) : 'tls';
+        
+        // Desativar verificação estrita de SSL/TLS (evita erro de CN mismatch por redirecionamento do host)
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
         
         echo "<span style='color: green;'>✓ Configuração PHPMailer OK!</span><br>";
         

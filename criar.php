@@ -84,8 +84,8 @@ $equipamentos = [
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="logos-container">
-                    <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech" class="logo">
-                    <img src="https://sitenovo.madetech.com.br/assets/logomadeparts.avif" alt="Madeparts" class="logo">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech" class="logo">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/07/Logo-Madeparts-Final.png" alt="Madeparts" class="logo">
                 </div>
                 <h2>Sistema RAT</h2>
             </div>

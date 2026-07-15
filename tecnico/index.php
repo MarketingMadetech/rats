@@ -922,7 +922,7 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
     <aside class="sidebar">
         <div class="sidebar-brand">
             <div class="logo-row">
-                <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech">
+                <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech">
                 <h2>Sistema RAT</h2>
             </div>
             <span class="version-badge">Técnico v1.0</span>
@@ -1091,12 +1091,29 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
                         <tbody>
                             <?php foreach ($rats_recentes as $rat): ?>
                             <tr>
-                                <td><span class="rat-number"><?= htmlspecialchars($rat['numero']) ?></span></td>
+                                <td><span class="rat-number"><?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?></span></td>
                                 <td><strong><?= htmlspecialchars($rat['cliente_empresa'] ?? '-') ?></strong></td>
                                 <td>
                                     <span class="badge badge-<?= $rat['status'] ?>">
                                         <?= ucfirst($rat['status']) ?>
                                     </span>
+                                    <?php if ($rat['status'] === 'enviado'): ?>
+                                    <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+                                        <?php if (isset($rat['pago_reembolso']) && $rat['pago_reembolso']): ?>
+                                            <span style="font-size: 11px; font-weight: 600; color: var(--success); display: inline-flex; align-items: center; gap: 4px;">
+                                                <i class="fas fa-check-double"></i> Reembolso Pago
+                                            </span>
+                                        <?php elseif (isset($rat['lancado_reembolso']) && $rat['lancado_reembolso']): ?>
+                                            <span style="font-size: 11px; font-weight: 600; color: #0284c7; display: inline-flex; align-items: center; gap: 4px;" title="Lançado no Financeiro">
+                                                <i class="fas fa-file-invoice-dollar"></i> Lançado no Financeiro
+                                            </span>
+                                        <?php else: ?>
+                                            <span style="font-size: 11px; font-weight: 500; color: var(--gray-500); display: inline-flex; align-items: center; gap: 4px;">
+                                                <i class="fas fa-clock"></i> Aguardando Reembolso
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php endif; ?>
                                 </td>
                                 <td style="color: var(--gray-500); font-size: 13px;">
                                     <?= date('d/m/Y H:i', strtotime($rat['data_criacao'])) ?>

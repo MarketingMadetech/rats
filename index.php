@@ -40,8 +40,8 @@ foreach ($rats as $rat) {
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="logos-container">
-                    <img src="https://www.madetech.com.br/loja/wp-content/uploads/2025/05/Logo-Madetech-Final.png" alt="Madetech" class="logo">
-                    <img src="https://sitenovo.madetech.com.br/assets/logomadeparts.avif" alt="Madeparts" class="logo">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/05/Logo-Madetech-Final.webp" alt="Madetech" class="logo">
+                    <img src="https://madetech.com.br/wp-content/uploads/2026/07/Logo-Madeparts-Final.png" alt="Madeparts" class="logo">
                 </div>
                 <h2>Sistema RAT</h2>
             </div>
@@ -158,7 +158,7 @@ foreach ($rats as $rat) {
                         <tbody>
                             <?php foreach ($rats as $rat): ?>
                                 <tr>
-                                    <td><strong><?= htmlspecialchars($rat['numero']) ?></strong></td>
+                                    <td><strong><?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?></strong></td>
                                     <td><?= htmlspecialchars($rat['cliente_empresa'] ?? '-') ?></td>
                                     <td><?= htmlspecialchars($rat['tecnico_nome'] ?? '-') ?></td>
                                     <td><?= htmlspecialchars($rat['equipamento'] ?? '-') ?></td>

@@ -19,16 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($empresa && $responsavel && $email_cliente) {
         try {
-            $numero_rat = gerarNumeroRATporTecnico($_SESSION['tecnico_id']);
+            $seq = obterProximoSequencialRAT($_SESSION['tecnico_id']);
+            $numero_rat = gerarNumeroRATporTecnico($_SESSION['tecnico_id'], $seq);
             
             $stmt = $db->prepare("
                 INSERT INTO rats (numero, numero_sequencial, id_tecnico, status, cliente_empresa, cliente_responsavel, email_cliente, endereco, cidade, estado, data_criacao)
                 VALUES (?, ?, ?, 'rascunho', ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             ");
-            
-            // Extrair número sequencial
-            $partes = explode('-', $numero_rat);
-            $seq = intval($partes[2]);
             
             $stmt->execute([$numero_rat, $seq, $_SESSION['tecnico_id'], $empresa, $responsavel, $email_cliente, $endereco, $cidade, $estado]);
             
