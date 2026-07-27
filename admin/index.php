@@ -1228,6 +1228,10 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
                                             <input type="checkbox" class="toggle-lancado" data-id="<?= $rat['id'] ?>" <?= !empty($rat['lancado_reembolso']) ? 'checked' : '' ?> style="accent-color: var(--primary-light); cursor: pointer; width: 13px; height: 13px; margin: 0;">
                                             <span><?= !empty($rat['lancado_reembolso']) ? 'Lançado Financeiro' : 'Lançar Financeiro' ?></span>
                                         </label>
+                                        <label class="sem-lancamento-label" style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: <?= !empty($rat['sem_lancamento']) ? '#f59e0b' : 'var(--gray-600)' ?>; cursor: pointer; transition: color 0.2s;">
+                                            <input type="checkbox" class="toggle-sem-lancamento" data-id="<?= $rat['id'] ?>" <?= !empty($rat['sem_lancamento']) ? 'checked' : '' ?> style="accent-color: #f59e0b; cursor: pointer; width: 13px; height: 13px; margin: 0;">
+                                            <span>Sem lançamento</span>
+                                        </label>
                                     </div>
                                     <?php endif; ?>
                                 </td>
@@ -1382,6 +1386,58 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
                     }
                 } else {
                     alert('Erro ao atualizar status do lançamento: ' + (data.error || 'Erro desconhecido'));
+                    this.checked = !this.checked;
+                }
+            })
+            .catch(err => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                alert('Erro de conexão ou permissão insuficiente.');
+                this.checked = !this.checked;
+            });
+        });
+    });
+
+    // Toggle Sem Lançamento
+    document.querySelectorAll('.toggle-sem-lancamento').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const ratId = this.dataset.id;
+            const isChecked = this.checked ? 1 : 0;
+            const labelContainer = this.closest('.sem-lancamento-label');
+            
+            if (labelContainer) {
+                labelContainer.style.opacity = '0.5';
+            }
+            
+            fetch('../api/atualizar-sem-lancamento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: ratId,
+                    sem_lancamento: isChecked
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (labelContainer) {
+                    labelContainer.style.opacity = '1';
+                }
+                if (data.success) {
+                    if (isChecked === 1) {
+                        labelContainer.style.color = '#f59e0b';
+                    } else {
+                        labelContainer.style.color = 'var(--gray-600)';
+                    }
+                } else {
+                    alert('Erro ao atualizar status do sem lançamento: ' + (data.error || 'Erro desconhecido'));
                     this.checked = !this.checked;
                 }
             })

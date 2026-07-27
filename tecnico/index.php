@@ -1103,9 +1103,13 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
                                             <span style="font-size: 11px; font-weight: 600; color: var(--success); display: inline-flex; align-items: center; gap: 4px;">
                                                 <i class="fas fa-check-double"></i> Reembolso Pago
                                             </span>
-                                        <?php elseif (isset($rat['lancado_reembolso']) && $rat['lancado_reembolso']): ?>
+                                         <?php elseif (isset($rat['lancado_reembolso']) && $rat['lancado_reembolso']): ?>
                                             <span style="font-size: 11px; font-weight: 600; color: #0284c7; display: inline-flex; align-items: center; gap: 4px;" title="Lançado no Financeiro">
                                                 <i class="fas fa-file-invoice-dollar"></i> Lançado no Financeiro
+                                            </span>
+                                        <?php elseif (isset($rat['sem_lancamento']) && $rat['sem_lancamento']): ?>
+                                            <span style="font-size: 11px; font-weight: 600; color: #f59e0b; display: inline-flex; align-items: center; gap: 4px;" title="Sem Lançamento">
+                                                <i class="fas fa-minus-circle"></i> Sem Lançamento
                                             </span>
                                         <?php else: ?>
                                             <span style="font-size: 11px; font-weight: 500; color: var(--gray-500); display: inline-flex; align-items: center; gap: 4px;">

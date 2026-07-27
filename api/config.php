@@ -124,6 +124,7 @@ function initDB() {
             observacoes TEXT,
             pago_reembolso INTEGER DEFAULT 0,
             lancado_reembolso INTEGER DEFAULT 0,
+            sem_lancamento INTEGER DEFAULT 0,
             
             -- Foreign key
             FOREIGN KEY (id_tecnico) REFERENCES tecnicos(id)
@@ -153,6 +154,7 @@ function initDB() {
         "ALTER TABLE rats ADD COLUMN tecnicos_adicionais_json TEXT DEFAULT '[]'",
         "ALTER TABLE rats ADD COLUMN pago_reembolso INTEGER DEFAULT 0",
         "ALTER TABLE rats ADD COLUMN lancado_reembolso INTEGER DEFAULT 0",
+        "ALTER TABLE rats ADD COLUMN sem_lancamento INTEGER DEFAULT 0",
     ];
     foreach ($migrations as $sql) {
         try { $db->exec($sql); } catch(Exception $e) { /* coluna já existe */ }
@@ -253,6 +255,7 @@ if (!file_exists(DB_PATH)) {
             "ALTER TABLE rats ADD COLUMN tecnicos_adicionais_json TEXT DEFAULT '[]'",
             "ALTER TABLE rats ADD COLUMN pago_reembolso INTEGER DEFAULT 0",
             "ALTER TABLE rats ADD COLUMN lancado_reembolso INTEGER DEFAULT 0",
+            "ALTER TABLE rats ADD COLUMN sem_lancamento INTEGER DEFAULT 0",
         ];
         foreach ($migrations as $sql) {
             try { $db_migrate->exec($sql); } catch(Exception $e) { /* coluna já existe */ }

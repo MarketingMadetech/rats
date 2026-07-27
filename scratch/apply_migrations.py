@@ -25,6 +25,14 @@ def run_migrations():
             print("Coluna 'lancado_reembolso' adicionada com sucesso.")
         except Exception as e:
             print("Erro ao adicionar 'lancado_reembolso':", e)
+
+    # Add sem_lancamento if it doesn't exist
+    if 'sem_lancamento' not in columns:
+        try:
+            cursor.execute("ALTER TABLE rats ADD COLUMN sem_lancamento INTEGER DEFAULT 0")
+            print("Coluna 'sem_lancamento' adicionada com sucesso.")
+        except Exception as e:
+            print("Erro ao adicionar 'sem_lancamento':", e)
             
     conn.commit()
     conn.close()
