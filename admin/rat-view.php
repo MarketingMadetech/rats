@@ -479,15 +479,21 @@ foreach ($kms_rodados_lista as $km) {
         .alert-erro    { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
         @media print {
-            header, .action-buttons {
-                display: none;
+            header, .action-buttons, #secao-feedback, .modal-overlay, .alert-reenvio {
+                display: none !important;
             }
             body {
                 background: white;
             }
+            .container {
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
             .info-card {
-                box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+                box-shadow: none !important;
+                border: 1px solid #e5e7eb !important;
                 page-break-inside: avoid;
+                margin-bottom: 15px;
             }
             .section-title {
                 page-break-after: avoid;
@@ -854,6 +860,18 @@ foreach ($kms_rodados_lista as $km) {
                     <?php else: ?>
                         <p style="color: #999;">Sem assinatura</p>
                     <?php endif; ?>
+                    <div style="margin-top: 8px; font-size: 13px; color: #374151; line-height: 1.4;">
+                        <?php 
+                        $nome_cliente_ass = !empty($rat['nome_assinatura']) ? $rat['nome_assinatura'] : ($rat['cliente_responsavel'] ?? '');
+                        if (!empty($nome_cliente_ass)): ?>
+                            <strong><?= htmlspecialchars($nome_cliente_ass) ?></strong><br>
+                        <?php endif; ?>
+                        <?php if (!empty($rat['cargo_assinatura']) || !empty($rat['cpf_assinatura'])): ?>
+                            <span style="font-size: 12px; color: #6b7280;">
+                                Cargo: <?= htmlspecialchars($rat['cargo_assinatura'] ?: '-') ?> | CPF: <?= htmlspecialchars($rat['cpf_assinatura'] ?: '-') ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <div>
                     <h4>Técnico: <?php echo htmlspecialchars($rat['tecnico_nome'] ?? '-'); ?></h4>
@@ -862,6 +880,9 @@ foreach ($kms_rodados_lista as $km) {
                     <?php else: ?>
                         <p style="color: #999;">Sem assinatura</p>
                     <?php endif; ?>
+                    <div style="margin-top: 8px; font-size: 13px; color: #374151;">
+                        <strong><?= htmlspecialchars($rat['tecnico_nome'] ?? 'Técnico Responsável') ?></strong>
+                    </div>
                 </div>
             </div>
         </div>

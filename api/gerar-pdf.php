@@ -507,13 +507,16 @@ $tecnicos_adicionais = json_decode($rat['tecnicos_adicionais_json'] ?? '[]', tru
                 <?php endif; ?>
                 <div class="assinatura-line">
                     <strong>Assinatura do Cliente</strong><br>
-                    <?php if (!empty($rat['nome_assinatura'])): ?>
-                        <?= htmlspecialchars($rat['nome_assinatura']) ?><br>
+                    <?php 
+                    $nome_resp = !empty($rat['nome_assinatura']) ? $rat['nome_assinatura'] : ($rat['cliente_responsavel'] ?? '');
+                    if (!empty($nome_resp)):
+                    ?>
+                        <?= htmlspecialchars($nome_resp) ?><br>
+                    <?php endif; ?>
+                    <?php if (!empty($rat['cargo_assinatura']) || !empty($rat['cpf_assinatura'])): ?>
                         <span style="font-size: 9pt; color: #555;">
-                            Cargo: <?= htmlspecialchars($rat['cargo_assinatura']) ?> | CPF: <?= htmlspecialchars($rat['cpf_assinatura']) ?>
+                            Cargo: <?= htmlspecialchars($rat['cargo_assinatura'] ?: '-') ?> | CPF: <?= htmlspecialchars($rat['cpf_assinatura'] ?: '-') ?>
                         </span>
-                    <?php else: ?>
-                        <?= htmlspecialchars($rat['cliente_responsavel']) ?>
                     <?php endif; ?>
                 </div>
             </div>

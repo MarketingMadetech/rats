@@ -236,6 +236,18 @@ $whatsapp_link = formatWhatsAppLink(WHATSAPP_NOTIFY, $whatsapp_msg);
                     <?php else: ?>
                         <p class="no-signature">Não assinado</p>
                     <?php endif; ?>
+                    <div style="margin-top: 10px; font-size: 14px; text-align: center; line-height: 1.4;">
+                        <?php 
+                        $nome_cliente_ass = !empty($rat['nome_assinatura']) ? $rat['nome_assinatura'] : ($rat['cliente_responsavel'] ?? '');
+                        if (!empty($nome_cliente_ass)): ?>
+                            <strong><?= htmlspecialchars($nome_cliente_ass) ?></strong><br>
+                        <?php endif; ?>
+                        <?php if (!empty($rat['cargo_assinatura']) || !empty($rat['cpf_assinatura'])): ?>
+                            <span style="font-size: 12px; color: #6b7280;">
+                                Cargo: <?= htmlspecialchars($rat['cargo_assinatura'] ?: '-') ?> | CPF: <?= htmlspecialchars($rat['cpf_assinatura'] ?: '-') ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <div class="card">
                     <h3><i class="fas fa-signature"></i> Assinatura do Técnico</h3>
@@ -244,6 +256,9 @@ $whatsapp_link = formatWhatsAppLink(WHATSAPP_NOTIFY, $whatsapp_msg);
                     <?php else: ?>
                         <p class="no-signature">Não assinado</p>
                     <?php endif; ?>
+                    <div style="margin-top: 10px; font-size: 14px; text-align: center;">
+                        <strong><?= htmlspecialchars($rat['tecnico_nome'] ?? 'Técnico Responsável') ?></strong>
+                    </div>
                 </div>
             </div>
 

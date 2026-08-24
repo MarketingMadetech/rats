@@ -23,27 +23,64 @@ $enviado = $stmt->fetch()['total'];
 
 // Filtro por status
 $status_filtro = $_GET['status'] ?? null;
-$status_validos = ['rascunho', 'enviado'];
+$status_validos = ['todos', 'rascunho', 'enviado'];
 if ($status_filtro && !in_array($status_filtro, $status_validos)) {
     $status_filtro = null;
 }
 
-if ($status_filtro) {
-    $stmt = $db->prepare("SELECT * FROM rats WHERE id_tecnico = ? AND status = ? ORDER BY data_criacao DESC LIMIT 20");
-    $stmt->execute([$tecnico_id, $status_filtro]);
-} else {
-    $stmt = $db->prepare("SELECT * FROM rats WHERE id_tecnico = ? ORDER BY data_criacao DESC LIMIT 10");
-    $stmt->execute([$tecnico_id]);
+// Filtro por empresa
+$empresa_filtro = trim($_GET['empresa'] ?? '');
+
+// Filtro por data
+$data_filtro = $_GET['data'] ?? null;
+
+$query = "SELECT * FROM rats WHERE id_tecnico = ?";
+$params = [$tecnico_id];
+
+if ($status_filtro && $status_filtro !== 'todos') {
+    $query .= " AND status = ?";
+    $params[] = $status_filtro;
 }
+
+if ($empresa_filtro) {
+    $query .= " AND cliente_empresa LIKE ?";
+    $params[] = '%' . $empresa_filtro . '%';
+}
+
+if ($data_filtro) {
+    $query .= " AND DATE(data_criacao) = ?";
+    $params[] = $data_filtro;
+}
+
+$has_filter = ($status_filtro !== null) || !empty($empresa_filtro) || !empty($data_filtro);
+
+if ($status_filtro === 'todos') {
+    $query .= " ORDER BY data_criacao DESC";
+} elseif ($has_filter) {
+    $query .= " ORDER BY data_criacao DESC LIMIT 100";
+} else {
+    $query .= " ORDER BY data_criacao DESC LIMIT 10";
+}
+
+$stmt = $db->prepare($query);
+$stmt->execute($params);
 $rats_recentes = $stmt->fetchAll();
 
 $iniciais = strtoupper(substr($tecnico_nome, 0, 1));
 
 $titulos_filtro = [
+    'todos' => 'Todos os Relatórios',
     'rascunho' => 'Rascunhos',
     'enviado' => 'Enviados',
 ];
-$titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios Recentes';
+
+if ($status_filtro) {
+    $titulo_tabela = $titulos_filtro[$status_filtro] ?? 'Meus Relatórios';
+} elseif (!empty($empresa_filtro) || !empty($data_filtro)) {
+    $titulo_tabela = 'Relatórios Filtrados';
+} else {
+    $titulo_tabela = 'Relatórios Recentes';
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -931,7 +968,7 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
         <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
-                <a href="index.php" class="nav-item <?= !$status_filtro ? 'active' : '' ?>">
+                <a href="index.php" class="nav-item <?= (!$status_filtro && empty($empresa_filtro) && empty($data_filtro)) ? 'active' : '' ?>">
                     <i class="fas fa-chart-pie"></i>
                     Meu Painel
                 </a>
@@ -939,7 +976,7 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
 
             <div class="nav-section">
                 <div class="nav-section-title">Meus RATs</div>
-                <a href="index.php" class="nav-item">
+                <a href="index.php?status=todos" class="nav-item <?= $status_filtro === 'todos' ? 'active' : '' ?>">
                     <i class="fas fa-clipboard-list"></i>
                     Todos
                     <span class="nav-badge"><?= $total_rats ?></span>
@@ -1019,7 +1056,7 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
 
             <!-- STATS -->
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card" onclick="window.location.href='index.php?status=todos'">
                     <div class="stat-card-header">
                         <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
                         <span class="stat-trend neutral"><i class="fas fa-minus"></i> Total</span>
@@ -1027,7 +1064,7 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
                     <div class="stat-number"><?= $total_rats ?></div>
                     <div class="stat-label">Meus RATs</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="window.location.href='index.php?status=rascunho'">
                     <div class="stat-card-header">
                         <div class="stat-icon"><i class="fas fa-pencil-alt"></i></div>
                         <span class="stat-trend neutral"><i class="fas fa-clock"></i> Pendente</span>
@@ -1035,7 +1072,7 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
                     <div class="stat-number"><?= $rascunho ?></div>
                     <div class="stat-label">Em Rascunho</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="window.location.href='index.php?status=enviado'">
                     <div class="stat-card-header">
                         <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                         <span class="stat-trend up"><i class="fas fa-arrow-up"></i> Completo</span>
@@ -1052,10 +1089,10 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
                     <h3>Criar Novo RAT</h3>
                     <p>Iniciar novo relatório</p>
                 </a>
-                <a href="index.php" class="action-card">
+                <a href="index.php?status=todos" class="action-card">
                     <div class="action-icon"><i class="fas fa-clipboard-check"></i></div>
                     <h3>Meus Relatórios</h3>
-                    <p>Ver e editar RATs</p>
+                    <p>Ver todos os seus RATs</p>
                 </a>
                 <a href="index.php?status=enviado" class="action-card">
                     <div class="action-icon"><i class="fas fa-paper-plane"></i></div>
@@ -1070,8 +1107,24 @@ $titulo_tabela = $status_filtro ? $titulos_filtro[$status_filtro] : 'Relatórios
                     <div class="table-header-left">
                         <div class="table-header-icon"><i class="fas fa-clock"></i></div>
                         <h2><?= $titulo_tabela ?></h2>
+                        <?php if ($has_filter || $status_filtro === 'todos'): ?>
+                        <span style="font-size: 13px; color: var(--gray-500); font-weight: 500;">(<?= count($rats_recentes) ?> <?= count($rats_recentes) === 1 ? 'relatório' : 'relatórios' ?>)</span>
+                        <?php endif; ?>
                     </div>
-                    <div class="table-header-right">
+                    <div class="table-header-right" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <form method="GET" action="index.php" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                            <input type="text" name="empresa" value="<?= htmlspecialchars($empresa_filtro) ?>" placeholder="Buscar empresa..." style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--gray-200); font-size: 13px; width: 140px;">
+                            <input type="date" name="data" value="<?= htmlspecialchars($data_filtro ?? '') ?>" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--gray-200); font-size: 13px;">
+                            <select name="status" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--gray-200); font-size: 13px;">
+                                <option value="todos" <?= ($status_filtro === 'todos' || (!$status_filtro && ($empresa_filtro || $data_filtro))) ? 'selected' : '' ?>>Todos Status</option>
+                                <option value="rascunho" <?= $status_filtro === 'rascunho' ? 'selected' : '' ?>>Rascunhos</option>
+                                <option value="enviado" <?= $status_filtro === 'enviado' ? 'selected' : '' ?>>Enviados</option>
+                            </select>
+                            <button type="submit" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--primary); background: var(--primary); color: white; font-size: 13px; cursor: pointer; font-weight: 600;"><i class="fas fa-search"></i> Filtrar</button>
+                            <?php if ($has_filter): ?>
+                            <a href="index.php" title="Limpar Filtros" style="color:var(--gray-500); font-size: 13px; padding: 4px; display:inline-flex; align-items:center;"><i class="fas fa-times"></i></a>
+                            <?php endif; ?>
+                        </form>
                         <a href="criar-rat.php"><i class="fas fa-plus"></i> Novo RAT</a>
                     </div>
                 </div>

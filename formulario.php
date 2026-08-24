@@ -103,6 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
         // Assinaturas
         $assinatura_cliente = $_POST['assinatura_cliente'] ?? '';
         $assinatura_tecnico = $_POST['assinatura_tecnico'] ?? '';
+        $nome_assinatura = trim($_POST['nome_assinatura'] ?? '');
+        $cargo_assinatura = trim($_POST['cargo_assinatura'] ?? '');
+        $cpf_assinatura = trim($_POST['cpf_assinatura'] ?? '');
         $aceite_cliente = isset($_POST['aceite_cliente']) ? 1 : 0;
         $aceite_tecnico = isset($_POST['aceite_tecnico']) ? 1 : 0;
         
@@ -144,6 +147,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
             assinatura_tecnico = ?,
             aceite_cliente = ?,
             aceite_tecnico = ?,
+            nome_assinatura = ?,
+            cargo_assinatura = ?,
+            cpf_assinatura = ?,
             status = 'preenchido',
             data_preenchimento = datetime('now')
             WHERE token = ?";
@@ -158,6 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
             $kms_rodados_json, $total_kms,
             $pedagio, $hospedagem, $alimentacao, $total_adicionais,
             $assinatura_cliente, $assinatura_tecnico, $aceite_cliente, $aceite_tecnico,
+            $nome_assinatura, $cargo_assinatura, $cpf_assinatura,
             $token
         ]);
         
@@ -842,6 +849,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
                                     <button type="button" onclick="limparAssinatura('Cliente')">
                                         <i class="fas fa-eraser"></i> Limpar
                                     </button>
+                                </div>
+                            </div>
+                            <div style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div style="grid-column: span 2;">
+                                    <label style="font-size: 13px; font-weight: 500; margin-bottom: 4px; display: block;">Nome do Responsável</label>
+                                    <input type="text" name="nome_assinatura" value="<?= htmlspecialchars($rat['nome_assinatura'] ?? $rat['cliente_responsavel'] ?? '') ?>" placeholder="Nome de quem está assinando" style="width: 100%; padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 14px;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 13px; font-weight: 500; margin-bottom: 4px; display: block;">Cargo</label>
+                                    <input type="text" name="cargo_assinatura" value="<?= htmlspecialchars($rat['cargo_assinatura'] ?? '') ?>" placeholder="Ex: Gerente" style="width: 100%; padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 14px;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 13px; font-weight: 500; margin-bottom: 4px; display: block;">CPF</label>
+                                    <input type="text" name="cpf_assinatura" value="<?= htmlspecialchars($rat['cpf_assinatura'] ?? '') ?>" placeholder="000.000.000-00" oninput="this.value = this.value.replace(/\D/g, '').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')" maxlength="14" style="width: 100%; padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 14px;">
                                 </div>
                             </div>
                         </div>
