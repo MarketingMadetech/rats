@@ -188,6 +188,76 @@ $total_tecnicos = count($tecnicos);
             color: var(--gray-900); font-weight: 500;
         }
 
+        /* Voice Dictation Styles */
+        .label-with-voice {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 8px;
+        }
+
+        .label-with-voice label {
+            margin-bottom: 0 !important;
+        }
+
+        .btn-voice-dictation {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--gray-50);
+            border: 1px solid var(--gray-300);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            user-select: none;
+            line-height: 1.2;
+        }
+
+        .btn-voice-dictation:hover {
+            background: var(--gray-200);
+            color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-voice-dictation i {
+            font-size: 11px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-voice-dictation.is-listening {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            border-color: #dc2626;
+            color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+            animation: voice-pulse 1.5s infinite;
+        }
+
+        .btn-voice-dictation.is-listening i {
+            animation: mic-bounce 0.8s infinite alternate ease-in-out;
+        }
+
+        @keyframes voice-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        @keyframes mic-bounce {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.25); }
+        }
+
+        .field-listening {
+            border-color: #f97316 !important;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2) !important;
+            background-color: #fffaf5 !important;
+        }
+
         /* ========== MOBILE ========== */
         .mobile-toggle {
             display: none; position: fixed; top: 15px; left: 14px; z-index: 300;
@@ -309,12 +379,22 @@ $total_tecnicos = count($tecnicos);
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Empresa *</label>
-                            <input type="text" name="cliente_empresa" placeholder="Nome da empresa" required>
+                            <div class="label-with-voice">
+                                <label>Empresa *</label>
+                                <button type="button" class="btn-voice-dictation" data-voice-target="cliente_empresa" title="Ditar por voz">
+                                    <i class="fas fa-microphone"></i> <span>Ditar</span>
+                                </button>
+                            </div>
+                            <input type="text" id="cliente_empresa" name="cliente_empresa" placeholder="Nome da empresa" required>
                         </div>
                         <div class="form-group">
-                            <label>Responsável *</label>
-                            <input type="text" name="cliente_responsavel" placeholder="Nome do responsável" required>
+                            <div class="label-with-voice">
+                                <label>Responsável *</label>
+                                <button type="button" class="btn-voice-dictation" data-voice-target="cliente_responsavel" title="Ditar por voz">
+                                    <i class="fas fa-microphone"></i> <span>Ditar</span>
+                                </button>
+                            </div>
+                            <input type="text" id="cliente_responsavel" name="cliente_responsavel" placeholder="Nome do responsável" required>
                         </div>
                     </div>
 
@@ -324,15 +404,25 @@ $total_tecnicos = count($tecnicos);
                             <input type="email" name="cliente_email" placeholder="email@empresa.com" required>
                         </div>
                         <div class="form-group">
-                            <label>Endereço</label>
-                            <input type="text" name="cliente_endereco" placeholder="Rua e número">
+                            <div class="label-with-voice">
+                                <label>Endereço</label>
+                                <button type="button" class="btn-voice-dictation" data-voice-target="cliente_endereco" title="Ditar por voz">
+                                    <i class="fas fa-microphone"></i> <span>Ditar</span>
+                                </button>
+                            </div>
+                            <input type="text" id="cliente_endereco" name="cliente_endereco" placeholder="Rua e número">
                         </div>
                     </div>
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Cidade</label>
-                            <input type="text" name="cliente_cidade" placeholder="Cidade">
+                            <div class="label-with-voice">
+                                <label>Cidade</label>
+                                <button type="button" class="btn-voice-dictation" data-voice-target="cliente_cidade" title="Ditar por voz">
+                                    <i class="fas fa-microphone"></i> <span>Ditar</span>
+                                </button>
+                            </div>
+                            <input type="text" id="cliente_cidade" name="cliente_cidade" placeholder="Cidade">
                         </div>
                         <div class="form-group">
                             <label>Estado</label>
@@ -356,6 +446,158 @@ $total_tecnicos = count($tecnicos);
         const icon = document.querySelector('#mobileToggle i');
         icon.className = document.querySelector('.sidebar').classList.contains('open') ? 'fas fa-times' : 'fas fa-bars';
     }
+
+    // ==========================================
+    // DITADO POR VOZ INTELIGENTE (Web Speech API)
+    // ==========================================
+    (function initVoiceDictation() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return;
+
+        let recognition = null;
+        let currentActiveBtn = null;
+        let currentTargetInput = null;
+        let isListening = false;
+        let restartTimeout = null;
+
+        function formatSpeechText(text) {
+            if (!text) return '';
+            let formatted = text
+                .replace(/\b(ponto final|ponto)\b/gi, '.')
+                .replace(/\b(vírgula)\b/gi, ',')
+                .replace(/\b(dois pontos)\b/gi, ':')
+                .replace(/\b(ponto e vírgula)\b/gi, ';')
+                .replace(/\b(interrogação|ponto de interrogação)\b/gi, '?')
+                .replace(/\b(exclamação|ponto de exclamação)\b/gi, '!')
+                .replace(/\b(nova linha|novo parágrafo|parágrafo)\b/gi, '\n');
+
+            formatted = formatted.replace(/\s+([.,!?:;])/g, '$1');
+            formatted = formatted.replace(/[ \t]+/g, ' ').trim();
+            if (!formatted) return '';
+            return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+        }
+
+        function startRecognitionSession() {
+            if (!isListening || !currentTargetInput) return;
+
+            try {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'pt-BR';
+                recognition.continuous = false; // Impede duplicação no Chrome Mobile
+                recognition.interimResults = true;
+                recognition.maxAlternatives = 1;
+
+                let phraseResult = '';
+
+                recognition.onstart = function() {
+                    if (currentActiveBtn && currentTargetInput) {
+                        currentActiveBtn.classList.add('is-listening');
+                        const span = currentActiveBtn.querySelector('span');
+                        if (span) span.textContent = 'Ouvindo...';
+                        currentTargetInput.classList.add('field-listening');
+                    }
+                };
+
+                recognition.onresult = function(event) {
+                    if (!currentTargetInput || !isListening) return;
+                    for (let i = 0; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            phraseResult = event.results[i][0].transcript;
+                        }
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    console.warn('SpeechRecognition error:', event.error);
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        alert('Permissão de microfone negada. Permita o microfone no navegador para ditar.');
+                        stopDictation();
+                    }
+                };
+
+                recognition.onend = function() {
+                    if (phraseResult && currentTargetInput) {
+                        const formatted = formatSpeechText(phraseResult);
+                        if (formatted) {
+                            const currentVal = (currentTargetInput.value || '').trim();
+                            if (currentVal) {
+                                const lastChar = currentVal.slice(-1);
+                                const separator = (lastChar === '\n') ? '' : ' ';
+                                currentTargetInput.value = currentVal + separator + formatted;
+                            } else {
+                                currentTargetInput.value = formatted;
+                            }
+                            currentTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            currentTargetInput.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        phraseResult = '';
+                    }
+
+                    if (isListening) {
+                        clearTimeout(restartTimeout);
+                        restartTimeout = setTimeout(() => {
+                            if (isListening) startRecognitionSession();
+                        }, 200);
+                    } else {
+                        stopDictation();
+                    }
+                };
+
+                recognition.start();
+            } catch(err) {
+                console.error('Erro ao iniciar reconhecimento de fala:', err);
+                stopDictation();
+            }
+        }
+
+        function stopDictation() {
+            isListening = false;
+            clearTimeout(restartTimeout);
+
+            if (recognition) {
+                try { recognition.stop(); } catch(e) {}
+                recognition = null;
+            }
+
+            if (currentActiveBtn) {
+                currentActiveBtn.classList.remove('is-listening');
+                const span = currentActiveBtn.querySelector('span');
+                if (span) span.textContent = 'Ditar';
+            }
+            if (currentTargetInput) currentTargetInput.classList.remove('field-listening');
+            currentActiveBtn = null;
+            currentTargetInput = null;
+        }
+
+        function toggleDictation(btn, targetInput) {
+            if (!targetInput) return;
+
+            if (isListening && currentActiveBtn === btn) {
+                stopDictation();
+                return;
+            }
+
+            if (isListening) {
+                stopDictation();
+            }
+
+            currentActiveBtn = btn;
+            currentTargetInput = targetInput;
+            isListening = true;
+
+            startRecognitionSession();
+        }
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-voice-dictation');
+            if (!btn) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const targetId = btn.getAttribute('data-voice-target');
+            const targetInput = targetId ? document.getElementById(targetId) : null;
+            if (targetInput) toggleDictation(btn, targetInput);
+        });
+    })();
     </script>
 </body>
 </html>

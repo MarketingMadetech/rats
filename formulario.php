@@ -296,6 +296,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
         }
         
         .form-group textarea { min-height: 120px; resize: vertical; }
+
+        /* Voice Dictation Styles */
+        .label-with-voice {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            gap: 8px;
+        }
+
+        .label-with-voice label {
+            margin-bottom: 0 !important;
+        }
+
+        .btn-voice-dictation {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--gray-50);
+            border: 1px solid var(--gray-300);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            user-select: none;
+            line-height: 1.2;
+        }
+
+        .btn-voice-dictation:hover {
+            background: var(--gray-200);
+            color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-voice-dictation.btn-voice-sm {
+            padding: 3px 8px;
+            font-size: 11px;
+        }
+
+        .btn-voice-dictation i {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-voice-dictation.is-listening {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            border-color: #dc2626;
+            color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+            animation: voice-pulse 1.5s infinite;
+        }
+
+        .btn-voice-dictation.is-listening i {
+            animation: mic-bounce 0.8s infinite alternate ease-in-out;
+        }
+
+        @keyframes voice-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        @keyframes mic-bounce {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.25); }
+        }
+
+        .field-listening {
+            border-color: #f97316 !important;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2) !important;
+            background-color: #fffaf5 !important;
+        }
+
+        .voice-live-preview {
+            display: none;
+            font-size: 11px;
+            color: #c2410c;
+            background: #fff7ed;
+            border: 1px dashed #fdba74;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .voice-live-preview.active {
+            display: block;
+        }
         
         /* Tabela de Turnos */
         .turno-table {
@@ -661,12 +752,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
                             <input type="text" value="<?= htmlspecialchars($rat['equipamento'] ?? '') ?>" readonly style="background: var(--gray-100);">
                         </div>
                         <div class="form-group">
-                            <label>Modelo da máquina <span class="required">*</span></label>
-                            <input type="text" name="modelo_maquina" value="<?= htmlspecialchars($rat['modelo_maquina'] ?? '') ?>" required>
+                            <div class="label-with-voice">
+                                <label>Modelo da máquina <span class="required">*</span></label>
+                                <button type="button" class="btn-voice-dictation btn-voice-sm" data-voice-target="modelo_maquina" title="Ditar por voz">
+                                    <i class="fas fa-microphone"></i> <span>Ditar</span>
+                                </button>
+                            </div>
+                            <input type="text" id="modelo_maquina" name="modelo_maquina" value="<?= htmlspecialchars($rat['modelo_maquina'] ?? '') ?>" required>
                         </div>
                         <div class="form-group">
-                            <label>Matrícula <span class="required">*</span></label>
-                            <input type="text" name="matricula" value="<?= htmlspecialchars($rat['matricula'] ?? '') ?>" required>
+                            <div class="label-with-voice">
+                                <label>Matrícula <span class="required">*</span></label>
+                                <button type="button" class="btn-voice-dictation btn-voice-sm" data-voice-target="matricula" title="Ditar por voz">
+                                    <i class="fas fa-microphone"></i> <span>Ditar</span>
+                                </button>
+                            </div>
+                            <input type="text" id="matricula" name="matricula" value="<?= htmlspecialchars($rat['matricula'] ?? '') ?>" required>
                         </div>
                         <div class="form-group">
                             <label>Máquina na garantia? <span class="required">*</span></label>
@@ -688,13 +789,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
                     if (!$esconder_defeito): 
                     ?>
                     <div class="form-group">
-                        <label>Defeito constatado <span class="required">*</span></label>
-                        <textarea name="defeito_constatado" required placeholder="Descreva o defeito encontrado..."><?= htmlspecialchars($rat['defeito_constatado'] ?? '') ?></textarea>
+                        <div class="label-with-voice">
+                            <label>Defeito constatado <span class="required">*</span></label>
+                            <button type="button" class="btn-voice-dictation" data-voice-target="defeito_constatado" title="Ditar por voz">
+                                <i class="fas fa-microphone"></i> <span>Ditar por Voz</span>
+                            </button>
+                        </div>
+                        <textarea id="defeito_constatado" name="defeito_constatado" required placeholder="Descreva o defeito encontrado..."><?= htmlspecialchars($rat['defeito_constatado'] ?? '') ?></textarea>
                     </div>
                     <?php endif; ?>
                     <div class="form-group">
-                        <label>Trabalho executado <span class="required">*</span></label>
-                        <textarea name="trabalho_executado" required placeholder="Descreva os serviços realizados..."><?= htmlspecialchars($rat['trabalho_executado'] ?? '') ?></textarea>
+                        <div class="label-with-voice">
+                            <label>Trabalho executado <span class="required">*</span></label>
+                            <button type="button" class="btn-voice-dictation" data-voice-target="trabalho_executado" title="Ditar por voz">
+                                <i class="fas fa-microphone"></i> <span>Ditar por Voz</span>
+                            </button>
+                        </div>
+                        <textarea id="trabalho_executado" name="trabalho_executado" required placeholder="Descreva os serviços realizados..."><?= htmlspecialchars($rat['trabalho_executado'] ?? '') ?></textarea>
                     </div>
                     <div class="form-group" style="max-width: 300px;">
                         <label>Horas de serviço</label>
@@ -996,6 +1107,228 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$sucesso) {
                 return;
             }
         });
+
+        // ==========================================
+        // DITADO POR VOZ INTELIGENTE (Web Speech API)
+        // ==========================================
+        (function initVoiceDictation() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                console.warn('Reconhecimento de fala não suportado nativamente neste navegador.');
+                document.querySelectorAll('.btn-voice-dictation').forEach(btn => {
+                    btn.title = 'Ditado por voz não suportado neste navegador (use Chrome, Edge ou Safari)';
+                    btn.style.opacity = '0.7';
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        alert('O reconhecimento de voz direto não é suportado pelo seu navegador atual. Recomendamos utilizar o Google Chrome, Microsoft Edge ou Safari.');
+                    });
+                });
+                return;
+            }
+
+            let recognition = null;
+            let currentActiveBtn = null;
+            let currentTargetInput = null;
+            let isListening = false;
+            let restartTimeout = null;
+
+            function formatSpeechText(text) {
+                if (!text) return '';
+                let formatted = text
+                    .replace(/\b(ponto final|ponto)\b/gi, '.')
+                    .replace(/\b(vírgula)\b/gi, ',')
+                    .replace(/\b(dois pontos)\b/gi, ':')
+                    .replace(/\b(ponto e vírgula)\b/gi, ';')
+                    .replace(/\b(interrogação|ponto de interrogação)\b/gi, '?')
+                    .replace(/\b(exclamação|ponto de exclamação)\b/gi, '!')
+                    .replace(/\b(nova linha|novo parágrafo|parágrafo)\b/gi, '\n');
+
+                // Limpar espaços antes de pontuações
+                formatted = formatted.replace(/\s+([.,!?:;])/g, '$1');
+                // Limpar múltiplos espaços
+                formatted = formatted.replace(/[ \t]+/g, ' ').trim();
+
+                if (!formatted) return '';
+                return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+            }
+
+            function startRecognitionSession() {
+                if (!isListening || !currentTargetInput) return;
+
+                try {
+                    recognition = new SpeechRecognition();
+                    recognition.lang = 'pt-BR';
+                    recognition.continuous = false; // Impede duplicação em cascata no Android/Chrome Mobile
+                    recognition.interimResults = true;
+                    recognition.maxAlternatives = 1;
+
+                    let phraseResult = '';
+
+                    recognition.onstart = function() {
+                        if (currentActiveBtn && currentTargetInput) {
+                            currentActiveBtn.classList.add('is-listening');
+                            const span = currentActiveBtn.querySelector('span');
+                            if (span) span.textContent = 'Ouvindo...';
+                            currentTargetInput.classList.add('field-listening');
+                            
+                            let preview = currentTargetInput.parentNode.querySelector('.voice-live-preview');
+                            if (!preview) {
+                                preview = document.createElement('div');
+                                preview.className = 'voice-live-preview';
+                                currentTargetInput.parentNode.appendChild(preview);
+                            }
+                            preview.textContent = '🎙️ Ouvindo... fale agora (toque no botão para encerrar)';
+                            preview.classList.add('active');
+                        }
+                    };
+
+                    recognition.onresult = function(event) {
+                        if (!currentTargetInput || !isListening) return;
+
+                        let interim = '';
+                        for (let i = 0; i < event.results.length; ++i) {
+                            if (event.results[i].isFinal) {
+                                phraseResult = event.results[i][0].transcript;
+                            } else {
+                                interim = event.results[i][0].transcript;
+                            }
+                        }
+
+                        const preview = currentTargetInput.parentNode.querySelector('.voice-live-preview');
+                        if (preview && interim) {
+                            preview.textContent = '🎙️ Ouvindo: "' + interim + '"';
+                        }
+                    };
+
+                    recognition.onerror = function(event) {
+                        console.warn('SpeechRecognition error:', event.error);
+                        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                            alert('Permissão de microfone negada. Permita o microfone no navegador para ditar.');
+                            stopDictation();
+                        }
+                    };
+
+                    recognition.onend = function() {
+                        if (phraseResult && currentTargetInput) {
+                            const formatted = formatSpeechText(phraseResult);
+                            if (formatted) {
+                                const currentVal = (currentTargetInput.value || '').trim();
+                                if (currentVal) {
+                                    const lastChar = currentVal.slice(-1);
+                                    const separator = (lastChar === '\n') ? '' : ' ';
+                                    currentTargetInput.value = currentVal + separator + formatted;
+                                } else {
+                                    currentTargetInput.value = formatted;
+                                }
+
+                                currentTargetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                                currentTargetInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+                                if (currentTargetInput.scrollHeight) {
+                                    currentTargetInput.scrollTop = currentTargetInput.scrollHeight;
+                                }
+
+                                const preview = currentTargetInput.parentNode.querySelector('.voice-live-preview');
+                                if (preview) {
+                                    preview.textContent = '✅ Trecho gravado!';
+                                }
+                            }
+                            phraseResult = '';
+                        }
+
+                        // Se o técnico ainda não clicou em parar, continua ouvindo a próxima frase
+                        if (isListening) {
+                            clearTimeout(restartTimeout);
+                            restartTimeout = setTimeout(() => {
+                                if (isListening) startRecognitionSession();
+                            }, 200);
+                        } else {
+                            stopDictation();
+                        }
+                    };
+
+                    recognition.start();
+                } catch(err) {
+                    console.error('Erro ao iniciar reconhecimento de fala:', err);
+                    stopDictation();
+                }
+            }
+
+            function stopDictation() {
+                isListening = false;
+                clearTimeout(restartTimeout);
+
+                if (recognition) {
+                    try { recognition.stop(); } catch(e) {}
+                    recognition = null;
+                }
+
+                if (currentActiveBtn) {
+                    currentActiveBtn.classList.remove('is-listening');
+                    const span = currentActiveBtn.querySelector('span');
+                    if (span) {
+                        const isSm = currentActiveBtn.classList.contains('btn-voice-sm');
+                        span.textContent = isSm ? 'Ditar' : (currentActiveBtn.getAttribute('data-voice-target')?.includes('defeito') || currentActiveBtn.getAttribute('data-voice-target')?.includes('trabalho') ? 'Ditar por Voz' : 'Ditar');
+                    }
+                }
+                if (currentTargetInput) {
+                    currentTargetInput.classList.remove('field-listening');
+                    const preview = currentTargetInput.parentNode.querySelector('.voice-live-preview');
+                    if (preview) {
+                        preview.classList.remove('active');
+                    }
+                }
+                currentActiveBtn = null;
+                currentTargetInput = null;
+            }
+
+            function toggleDictation(btn, targetInput) {
+                if (!targetInput) return;
+
+                if (isListening && currentActiveBtn === btn) {
+                    stopDictation();
+                    return;
+                }
+
+                if (isListening) {
+                    stopDictation();
+                }
+
+                currentActiveBtn = btn;
+                currentTargetInput = targetInput;
+                isListening = true;
+
+                startRecognitionSession();
+            }
+
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.btn-voice-dictation');
+                if (!btn) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+
+                const targetId = btn.getAttribute('data-voice-target');
+                let targetInput = null;
+
+                if (targetId) {
+                    targetInput = document.getElementById(targetId) || document.querySelector(`[name="${targetId}"]`);
+                }
+                
+                if (!targetInput) {
+                    const formGroup = btn.closest('.form-group') || btn.closest('.section') || btn.parentNode;
+                    if (formGroup) {
+                        targetInput = formGroup.querySelector('textarea, input[type="text"]');
+                    }
+                }
+
+                if (targetInput) {
+                    toggleDictation(btn, targetInput);
+                }
+            });
+        })();
     </script>
 </body>
 </html>
