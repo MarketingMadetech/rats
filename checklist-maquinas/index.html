@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Checklist de Saída de Máquina | Madetech</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top"><div><strong>MADETECH</strong><span>Controle de expedição</span></div><small>Checklist de Saída de Máquina · Rev. 01 — 09/2026</small></header>
+  <main>
+    <div id="result" class="notice success" hidden></div>
+    <div id="formArea">
+      <div class="intro"><p class="eyebrow">Showroom · Expedição · Entrega ao cliente</p><h1>Checklist de Saída de Máquina</h1><p>Preencha e assine antes do carregamento. A separação e a conferência no caminhão devem ser feitas por pessoas diferentes.</p><p class="warning">Nenhuma máquina sai sem este checklist preenchido e assinado.</p></div>
+      <div id="error" class="notice error" role="alert" hidden></div>
+      <form id="checklistForm">
+        <section class="card"><h2>Identificação</h2><div class="fields">
+          <label>Equipamento<input name="equipamento" required maxlength="250"></label>
+          <label>Modelo<input name="modelo" required maxlength="250"></label>
+          <label>Número de série<input name="numero_serie" required maxlength="250"></label>
+          <label>Nota fiscal<input name="nota_fiscal" required maxlength="250"></label>
+          <label>Pedido<input name="pedido" required maxlength="250"></label>
+          <label>Data de saída<input name="data_saida" type="date" required></label>
+          <label>Cliente<input name="cliente" required maxlength="250"></label>
+          <label>Cidade / UF<input name="cidade_uf" required maxlength="250"></label>
+          <label>Transportadora<input name="transportadora" required maxlength="250"></label>
+          <label>Separado por<input name="separado_por" required maxlength="250"></label>
+          <label>Conferido por<input name="conferido_por" required maxlength="250"></label>
+          <label>Liberado por<input name="liberado_por" required maxlength="250"></label>
+        </div></section>
+        <section class="card"><h2>Como usar</h2><ol>
+          <li>Quem monta o pallet marca cada item na 1ª conferência e anota a quantidade.</li>
+          <li>Outra pessoa confere a carga já no caminhão na 2ª conferência.</li>
+          <li>Marque “Não se aplica” quando o item não corresponder ao equipamento; não deixe em branco.</li>
+          <li>Registre qualquer pendência com prazo e responsável.</li>
+          <li>Coloque acessórios pequenos em caixa lacrada e identificada.</li>
+          <li>Fotografe o pallet montado antes de fechar a embalagem.</li>
+        </ol><p class="hint">Se a máquina sair do showroom, confirme que as peças usadas na demonstração voltaram para ela.</p></section>
+        <section class="card"><h2>Família do equipamento</h2><label>Selecione a seção aplicável<select name="familia" id="familia" required><option value="">Selecione...</option></select></label></section>
+        <div id="sections"></div>
+        <section class="card"><h2>Pendências e observações</h2><p class="hint">Item pendente sem registro é considerado esquecimento.</p><div class="fields">
+          <label class="wide">Pendências<textarea name="pendencias" rows="4" placeholder="Descreva item, quantidade e providência necessária"></textarea></label>
+          <label>Prazo<input type="date" name="prazo_pendencias"></label>
+          <label>Responsável<input name="responsavel_pendencias" maxlength="250"></label>
+          <label class="wide">Observações<textarea name="observacoes" rows="3"></textarea></label>
+          <label class="wide">Foto do pallet montado (JPG, PNG ou WebP, até 2 MB)<input type="file" name="foto_pallet" accept="image/jpeg,image/png,image/webp" required></label>
+        </div></section>
+        <section class="card"><h2>Assinaturas</h2><p>Confirmo que os itens aplicáveis foram conferidos e embarcados e que as pendências estão registradas com prazo e responsável. Estou ciente de que itens faltantes na chegada podem gerar novo deslocamento e custo adicional.</p><div class="signatures" id="signatures"></div></section>
+        <button class="submit" type="submit">Registrar checklist na planilha</button><p class="hint center">O envio será confirmado somente após a gravação na planilha.</p>
+      </form>
+    </div>
+  </main>
+  <footer>Madetech Com. Imp. Exp. de Máquinas Ltda · CNPJ 13.761.280/0001-00<br>R. Lopes da Costa, 135B · Jaçanã, São Paulo · SP · (11) 2440-4470 · Suporte: (11) 92066-4794</footer>
+  <script src="catalog.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

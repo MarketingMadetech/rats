@@ -1050,6 +1050,10 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
                     <i class="fas fa-clipboard-check"></i>
                     Checklist
                 </a>
+                <a href="https://madetech.com.br/checklist-maquina/" target="_blank" class="nav-item">
+                    <i class="fas fa-cogs"></i>
+                    Máquinas Checklist
+                </a>
             </div>
         </nav>
 

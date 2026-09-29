@@ -1,0 +1,4 @@
+Options -Indexes
+<FilesMatch "^(Code\.gs|Catalog\.gs|README\.md|verify\.mjs|config\.(example|local)\.php)$">
+    Require all denied
+</FilesMatch>

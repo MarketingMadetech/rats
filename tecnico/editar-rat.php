@@ -1390,6 +1390,21 @@ $iniciais = strtoupper(substr($tecnico_nome, 0, 1));
                     <i class="fas fa-file-edit"></i> <?= htmlspecialchars(exibirNumeroRAT($rat['numero'], $rat['numero_sequencial'] ?? null)) ?>
                 </a>
             </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Acesso</div>
+                <a href="<?= BASE_URL ?>tecnico/login.php" class="nav-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    Painel Técnico
+                </a>
+                <a href="https://madetech.com.br/checklist/" target="_blank" class="nav-item">
+                    <i class="fas fa-clipboard-check"></i>
+                    Checklist
+                </a>
+                <a href="https://madetech.com.br/checklist-maquina/" target="_blank" class="nav-item">
+                    <i class="fas fa-cogs"></i>
+                    Máquinas Checklist
+                </a>
+            </div>
             <?php else: ?>
             <div class="nav-section">
                 <div class="nav-section-title">Principal</div>
