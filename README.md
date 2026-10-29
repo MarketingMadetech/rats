@@ -22,6 +22,7 @@ Atualmente está configurado para envio seguro via **Google Workspace (SMTP Gmai
 *   **Destinatários Padrão**:
     *   Suporte Central: `suporte@madeparts.com.br`
     *   Marketing Central: `marketing@madetech.com.br`
+    *   Administrativo: `raquel@madeparts.com.br`
 
 ---
 
