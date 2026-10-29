@@ -21,6 +21,8 @@ $stmt = $db->prepare("SELECT COUNT(*) as total FROM rats WHERE id_tecnico = ? AN
 $stmt->execute([$tecnico_id]);
 $enviado = $stmt->fetch()['total'];
 
+$showroom_problemas = contarProblemasShowroom($db);
+
 // Filtro por status
 $status_filtro = $_GET['status'] ?? null;
 $status_validos = ['todos', 'rascunho', 'enviado'];
@@ -605,7 +607,7 @@ if ($status_filtro) {
         /* Quick Actions */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             margin-bottom: 32px;
         }
@@ -633,7 +635,8 @@ if ($status_filtro) {
 
         .action-card:nth-child(1)::after { background: var(--primary); }
         .action-card:nth-child(2)::after { background: var(--success); }
-        .action-card:nth-child(3)::after { background: var(--purple); }
+        .action-card:nth-child(3)::after { background: var(--teal); }
+        .action-card:nth-child(4)::after { background: var(--purple); }
 
         .action-card:hover::after { transform: scaleX(1); }
 
@@ -645,6 +648,7 @@ if ($status_filtro) {
         .action-card:nth-child(1) { animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s both; }
         .action-card:nth-child(2) { animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s both; }
         .action-card:nth-child(3) { animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.0s both; }
+        .action-card:nth-child(4) { animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.05s both; }
 
         .action-icon {
             width: 56px; height: 56px;
@@ -662,6 +666,7 @@ if ($status_filtro) {
         .action-card:nth-child(1) .action-icon { background: linear-gradient(135deg, var(--secondary), #ff9940); color: white; }
         .action-card:nth-child(2) .action-icon { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; }
         .action-card:nth-child(3) .action-icon { background: linear-gradient(135deg, var(--teal), #0d9488); color: white; }
+        .action-card:nth-child(4) .action-icon { background: linear-gradient(135deg, var(--purple), #7c3aed); color: white; }
 
         .action-card h3 {
             font-size: 15px;
@@ -910,7 +915,7 @@ if ($status_filtro) {
             .mobile-toggle { display: flex; align-items: center; justify-content: center; }
             .main-content { margin-left: 0; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
-            .quick-actions { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: 1fr 1fr; }
             .topbar { padding: 0 20px 0 68px; }
             .content { padding: 24px 20px; }
         }
@@ -921,7 +926,7 @@ if ($status_filtro) {
             .mobile-toggle { top: 10px; }
             .topbar-left h1 { font-size: 15px; }
             .stats-grid { grid-template-columns: 1fr; gap: 12px; }
-            .quick-actions { gap: 12px; }
+            .quick-actions { grid-template-columns: 1fr; gap: 12px; }
             .stat-number { font-size: 28px; }
             .welcome-banner {
                 flex-direction: column;
@@ -990,6 +995,27 @@ if ($status_filtro) {
                     <i class="fas fa-paper-plane"></i>
                     Enviados
                     <span class="nav-badge green"><?= $enviado ?></span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Showroom</div>
+                <a href="showroom.php" class="nav-item">
+                    <i class="fas fa-industry"></i>
+                    Máquinas Showroom
+                    <span class="nav-badge <?= $showroom_problemas > 0 ? '' : 'green' ?>" title="Máquinas com problema"><?= $showroom_problemas ?></span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Acesso</div>
+                <a href="https://madetech.com.br/checklist/" target="_blank" class="nav-item">
+                    <i class="fas fa-clipboard-check"></i>
+                    Checklist
+                </a>
+                <a href="https://madetech.com.br/checklist-maquina/" target="_blank" class="nav-item">
+                    <i class="fas fa-cogs"></i>
+                    Máquinas Checklist
                 </a>
             </div>
         </nav>
@@ -1098,6 +1124,11 @@ if ($status_filtro) {
                     <div class="action-icon"><i class="fas fa-paper-plane"></i></div>
                     <h3>RATs Enviados</h3>
                     <p>Relatórios finalizados</p>
+                </a>
+                <a href="showroom.php" class="action-card">
+                    <div class="action-icon"><i class="fas fa-industry"></i></div>
+                    <h3>Máquinas Showroom</h3>
+                    <p>Status dos equipamentos</p>
                 </a>
             </div>
 

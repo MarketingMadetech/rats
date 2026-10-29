@@ -30,6 +30,8 @@ $enviado = $stmt->fetch()['total'];
 $stmt = $db->query("SELECT COUNT(*) as total FROM tecnicos");
 $total_tecnicos = $stmt->fetch()['total'];
 
+$showroom_problemas = contarProblemasShowroom($db);
+
 // Obter lista de técnicos para o filtro
 $stmt_tec = $db->query("SELECT id, nome FROM tecnicos ORDER BY nome ASC");
 $todos_tecnicos = $stmt_tec->fetchAll();
@@ -625,7 +627,7 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
         /* Quick Actions */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             margin-bottom: 32px;
         }
@@ -664,6 +666,7 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
         .action-card:nth-child(1) { animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s both; }
         .action-card:nth-child(2) { animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.0s both; }
         .action-card:nth-child(3) { animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.1s both; }
+        .action-card:nth-child(4) { animation: cardPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1.15s both; }
 
         .action-icon {
             width: 56px;
@@ -684,6 +687,7 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
         .action-card:nth-child(1) .action-icon { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; }
         .action-card:nth-child(2) .action-icon { background: linear-gradient(135deg, var(--success), #059669); color: white; }
         .action-card:nth-child(3) .action-icon { background: linear-gradient(135deg, var(--purple), #7c3aed); color: white; }
+        .action-card:nth-child(4) .action-icon { background: linear-gradient(135deg, var(--secondary), #ff9940); color: white; }
 
         .action-card h3 {
             font-size: 15px;
@@ -950,7 +954,7 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
             .mobile-toggle { display: flex; align-items: center; justify-content: center; }
             .main-content { margin-left: 0; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .quick-actions { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: repeat(2, 1fr); }
             .topbar { padding: 0 20px 0 68px; }
             .content { padding: 24px 20px; }
         }
@@ -961,6 +965,7 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
             .mobile-toggle { top: 10px; }
             .topbar-left h1 { font-size: 15px; }
             .stats-grid { grid-template-columns: 1fr; gap: 12px; }
+            .quick-actions { grid-template-columns: 1fr; gap: 12px; }
             .stat-number { font-size: 28px; }
             .welcome-banner {
                 flex-direction: column;
@@ -1037,6 +1042,15 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
                     <i class="fas fa-paper-plane"></i>
                     Enviados
                     <span class="nav-badge green"><?= $enviado ?></span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Showroom</div>
+                <a href="showroom.php" class="nav-item">
+                    <i class="fas fa-industry"></i>
+                    Máquinas Showroom
+                    <span class="nav-badge <?= $showroom_problemas > 0 ? '' : 'green' ?>" title="Máquinas com problema"><?= $showroom_problemas ?></span>
                 </a>
             </div>
 
@@ -1158,6 +1172,11 @@ $titulo_tabela = $has_filter ? 'RATs Filtrados' : 'RATs Recentes';
                     <div class="action-icon"><i class="fas fa-clipboard-check"></i></div>
                     <h3>Acompanhar RATs</h3>
                     <p>Visualizar relatórios</p>
+                </a>
+                <a href="showroom.php" class="action-card">
+                    <div class="action-icon"><i class="fas fa-industry"></i></div>
+                    <h3>Máquinas Showroom</h3>
+                    <p>Status dos equipamentos</p>
                 </a>
                 <a href="../tecnico/login.php" class="action-card">
                     <div class="action-icon"><i class="fas fa-exchange-alt"></i></div>

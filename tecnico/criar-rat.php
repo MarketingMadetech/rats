@@ -410,6 +410,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="fas fa-plus-circle"></i> Criar RAT
                 </a>
             </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Showroom</div>
+                <a href="showroom.php" class="nav-item">
+                    <i class="fas fa-industry"></i> Máquinas Showroom
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Acesso</div>
+                <a href="https://madetech.com.br/checklist/" target="_blank" class="nav-item">
+                    <i class="fas fa-clipboard-check"></i> Checklist
+                </a>
+                <a href="https://madetech.com.br/checklist-maquina/" target="_blank" class="nav-item">
+                    <i class="fas fa-cogs"></i> Máquinas Checklist
+                </a>
+            </div>
         </nav>
 
         <div class="sidebar-footer">

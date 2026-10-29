@@ -15,11 +15,17 @@ switch ($action) {
         $db = getDB();
         $stmt = $db->query("SELECT * FROM rats ORDER BY id DESC");
         $rats = $stmt->fetchAll();
+
+        $showroom = [];
+        try {
+            $showroom = $db->query("SELECT * FROM showroom_maquinas ORDER BY nome ASC")->fetchAll();
+        } catch (Exception $e) {}
         
         $backup = [
             'data_backup' => date('Y-m-d H:i:s'),
             'total_registros' => count($rats),
-            'rats' => $rats
+            'rats' => $rats,
+            'showroom_maquinas' => $showroom
         ];
         
         // Salvar arquivo de backup

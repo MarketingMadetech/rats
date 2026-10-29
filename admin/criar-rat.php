@@ -307,6 +307,10 @@ $total_tecnicos = count($tecnicos);
                 <a href="criar-rat.php" class="nav-item active"><i class="fas fa-plus-circle"></i> Criar RAT</a>
             </div>
             <div class="nav-section">
+                <div class="nav-section-title">Showroom</div>
+                <a href="showroom.php" class="nav-item"><i class="fas fa-industry"></i> Máquinas Showroom</a>
+            </div>
+            <div class="nav-section">
                 <div class="nav-section-title">Acesso</div>
                 <a href="../tecnico/login.php" class="nav-item">
                     <i class="fas fa-exchange-alt"></i>

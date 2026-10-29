@@ -159,8 +159,117 @@ function initDB() {
     foreach ($migrations as $sql) {
         try { $db->exec($sql); } catch(Exception $e) { /* coluna já existe */ }
     }
+
+    inicializarShowroom($db);
     
     return $db;
+}
+
+// Normalizar chaves legadas de tipo do Showroom para nomes legíveis das famílias Madetech
+function normalizarTipoShowroom($tipo) {
+    $t = trim((string)($tipo ?? ''));
+    $mapa = [
+        'router'          => 'Centro Nesting CNC',
+        'coladeira'       => 'Coladeira de Bordos',
+        'seccionadora'    => 'Seccionadora Vertical',
+        'furadeira'       => 'Centro de Furação',
+        'esquadrejadeira' => 'Esquadrejadeira',
+        'laser'           => 'Solda a Laser',
+        'prensa'          => 'Guilhotina Hidráulica',
+        'outro'           => 'Outro',
+    ];
+    $key = strtolower($t);
+    if (isset($mapa[$key])) {
+        return $mapa[$key];
+    }
+    return $t !== '' ? $t : 'Outro';
+}
+
+// Criar e popular tabela inicial de Máquinas Showroom (executado apenas na criação da tabela)
+function inicializarShowroom($db = null) {
+    if (!$db) {
+        $db = getDB();
+    }
+    $existe = (bool)$db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='showroom_maquinas'")->fetchColumn();
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS showroom_maquinas (
+            id VARCHAR(64) PRIMARY KEY,
+            nome VARCHAR(150) NOT NULL,
+            modelo VARCHAR(150) DEFAULT '',
+            serie VARCHAR(80) DEFAULT '',
+            tipo VARCHAR(100) DEFAULT 'Outro',
+            quantidade INTEGER DEFAULT 1,
+            estado VARCHAR(30) DEFAULT 'sem_info',
+            obs TEXT DEFAULT '',
+            info_extra TEXT DEFAULT '',
+            atualizado_em VARCHAR(40) DEFAULT '',
+            atualizado_por VARCHAR(150) DEFAULT '',
+            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+
+    try {
+        $db->exec("ALTER TABLE showroom_maquinas ADD COLUMN info_extra TEXT DEFAULT ''");
+    } catch (Exception $e) {
+        // Coluna já existe
+    }
+
+    try {
+        $db->exec("ALTER TABLE showroom_maquinas ADD COLUMN quantidade INTEGER DEFAULT 1");
+    } catch (Exception $e) {
+        // Coluna já existe
+    }
+
+    // Migrar códigos legados ('router', 'coladeira', etc.) para os nomes reais das categorias
+    $mapa = [
+        'router'          => 'Centro Nesting CNC',
+        'coladeira'       => 'Coladeira de Bordos',
+        'seccionadora'    => 'Seccionadora Vertical',
+        'furadeira'       => 'Centro de Furação',
+        'esquadrejadeira' => 'Esquadrejadeira',
+        'laser'           => 'Solda a Laser',
+        'prensa'          => 'Guilhotina Hidráulica',
+        'outro'           => 'Outro',
+    ];
+    try {
+        $upd = $db->prepare("UPDATE showroom_maquinas SET tipo = ? WHERE LOWER(tipo) = ?");
+        foreach ($mapa as $oldKey => $newLabel) {
+            $upd->execute([$newLabel, $oldKey]);
+        }
+    } catch (Exception $e) {}
+
+    if (!$existe) {
+        $seed = [
+            ['Centro Nesting CNC', 'CutPro', 'Centro Nesting CNC'],
+            ['Coladeira de Bordos Contour S-Line', 'Contour S-Line', 'Coladeira de Bordos'],
+            ['Seccionadora Vertical', 'SVP 145 Plus', 'Seccionadora Vertical'],
+            ['Centro de Furação MaxDrill', 'MaxDrill M6.5', 'Centro de Furação'],
+            ['Esquadrejadeira MJ1132C', 'MJ1132C', 'Esquadrejadeira'],
+        ];
+        $agora = date('c');
+        $stmt = $db->prepare("
+            INSERT INTO showroom_maquinas (id, nome, modelo, serie, tipo, estado, obs, info_extra, atualizado_em, atualizado_por)
+            VALUES (?, ?, ?, '', ?, 'sem_info', '', '', ?, '')
+        ");
+        foreach ($seed as $idx => $item) {
+            $id = 'm' . time() . ($idx + 1);
+            $stmt->execute([$id, $item[0], $item[1], $item[2], $agora]);
+        }
+    }
+}
+
+// Contar máquinas do Showroom com problema (para badge no menu lateral)
+function contarProblemasShowroom($db = null) {
+    try {
+        if (!$db) {
+            $db = getDB();
+        }
+        $stmt = $db->query("SELECT COALESCE(SUM(CASE WHEN COALESCE(quantidade, 1) > 0 THEN COALESCE(quantidade, 1) ELSE 1 END), 0) as total FROM showroom_maquinas WHERE estado IN ('restricao', 'manutencao', 'aguardando', 'parada')");
+        $row = $stmt->fetch();
+        return (int)($row['total'] ?? 0);
+    } catch (Exception $e) {
+        return 0;
+    }
 }
 
 // Obter próximo número sequencial de RAT para o técnico (inteiro)
@@ -260,6 +369,7 @@ if (!file_exists(DB_PATH)) {
         foreach ($migrations as $sql) {
             try { $db_migrate->exec($sql); } catch(Exception $e) { /* coluna já existe */ }
         }
+        inicializarShowroom($db_migrate);
         unset($db_migrate);
     } catch(Exception $e) { /* silencioso */ }
 }

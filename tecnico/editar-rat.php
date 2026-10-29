@@ -1391,6 +1391,12 @@ $iniciais = strtoupper(substr($tecnico_nome, 0, 1));
                 </a>
             </div>
             <div class="nav-section">
+                <div class="nav-section-title">Showroom</div>
+                <a href="<?= BASE_URL ?>admin/showroom.php" class="nav-item">
+                    <i class="fas fa-industry"></i> Máquinas Showroom
+                </a>
+            </div>
+            <div class="nav-section">
                 <div class="nav-section-title">Acesso</div>
                 <a href="<?= BASE_URL ?>tecnico/login.php" class="nav-item">
                     <i class="fas fa-exchange-alt"></i>
@@ -1419,6 +1425,21 @@ $iniciais = strtoupper(substr($tecnico_nome, 0, 1));
                 </a>
                 <a href="criar-rat.php" class="nav-item">
                     <i class="fas fa-plus-circle"></i> Criar Novo
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Showroom</div>
+                <a href="showroom.php" class="nav-item">
+                    <i class="fas fa-industry"></i> Máquinas Showroom
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Acesso</div>
+                <a href="https://madetech.com.br/checklist/" target="_blank" class="nav-item">
+                    <i class="fas fa-clipboard-check"></i> Checklist
+                </a>
+                <a href="https://madetech.com.br/checklist-maquina/" target="_blank" class="nav-item">
+                    <i class="fas fa-cogs"></i> Máquinas Checklist
                 </a>
             </div>
             <?php endif; ?>
